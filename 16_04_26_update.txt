@@ -1,0 +1,5 @@
+Notebook de modelado (03_Modeling_Churn.ipynb) — entrena, evalúa, SHAP, guarda pickle. Es el corazón de todo.
+Scripts modulares para Airflow — extraer el código del notebook en 3 scripts Python (data_preparation.py, train_model.py, evaluate_model.py).
+DAG de Airflow (churn_pipeline_dag.py) — orquesta los 3 scripts.
+Docker-compose + estructura de carpetas — para que todo corra en contenedores.
+Presentación (.pptx) — con la historia completa: problema → EDA → trampas → modelo → SHAP → recomendaciones → arquitectura.
