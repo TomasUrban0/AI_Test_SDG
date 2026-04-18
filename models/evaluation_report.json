@@ -1,0 +1,76 @@
+{
+  "metrics": {
+    "threshold": 0.5,
+    "auc_roc": 0.6986,
+    "avg_precision": 0.6856,
+    "f1": 0.6399,
+    "recall": 0.6415,
+    "precision": 0.6382,
+    "accuracy": 0.6421,
+    "confusion_matrix": {
+      "TN": 4863,
+      "FP": 2703,
+      "FN": 2665,
+      "TP": 4769
+    }
+  },
+  "lift": {
+    "top_5pct": {
+      "cumulative_gain": 0.0835,
+      "lift": 1.67,
+      "churners_captured": 621,
+      "total_churners": 7434,
+      "customers_contacted": 750
+    },
+    "top_10pct": {
+      "cumulative_gain": 0.1593,
+      "lift": 1.59,
+      "churners_captured": 1184,
+      "total_churners": 7434,
+      "customers_contacted": 1500
+    },
+    "top_15pct": {
+      "cumulative_gain": 0.2303,
+      "lift": 1.54,
+      "churners_captured": 1712,
+      "total_churners": 7434,
+      "customers_contacted": 2250
+    },
+    "top_20pct": {
+      "cumulative_gain": 0.298,
+      "lift": 1.49,
+      "churners_captured": 2215,
+      "total_churners": 7434,
+      "customers_contacted": 3000
+    },
+    "top_25pct": {
+      "cumulative_gain": 0.3608,
+      "lift": 1.44,
+      "churners_captured": 2682,
+      "total_churners": 7434,
+      "customers_contacted": 3750
+    },
+    "top_30pct": {
+      "cumulative_gain": 0.4241,
+      "lift": 1.41,
+      "churners_captured": 3153,
+      "total_churners": 7434,
+      "customers_contacted": 4500
+    },
+    "top_40pct": {
+      "cumulative_gain": 0.54,
+      "lift": 1.35,
+      "churners_captured": 4014,
+      "total_churners": 7434,
+      "customers_contacted": 6000
+    },
+    "top_50pct": {
+      "cumulative_gain": 0.6433,
+      "lift": 1.29,
+      "churners_captured": 4782,
+      "total_churners": 7434,
+      "customers_contacted": 7500
+    }
+  },
+  "timestamp": "2026-04-18T12:52:12.656632"
+}

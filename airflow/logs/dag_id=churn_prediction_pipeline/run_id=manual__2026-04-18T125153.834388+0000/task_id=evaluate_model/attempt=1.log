@@ -1,0 +1,68 @@
+[2026-04-18T12:52:11.844+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: churn_prediction_pipeline.evaluate_model manual__2026-04-18T12:51:53.834388+00:00 [queued]>
+[2026-04-18T12:52:11.849+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: churn_prediction_pipeline.evaluate_model manual__2026-04-18T12:51:53.834388+00:00 [queued]>
+[2026-04-18T12:52:11.849+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2026-04-18T12:52:11.858+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): evaluate_model> on 2026-04-18 12:51:53.834388+00:00
+[2026-04-18T12:52:11.861+0000] {standard_task_runner.py:60} INFO - Started process 291 to run task
+[2026-04-18T12:52:11.862+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'churn_prediction_pipeline', 'evaluate_model', 'manual__2026-04-18T12:51:53.834388+00:00', '--job-id', '5', '--raw', '--subdir', 'DAGS_FOLDER/churn_pipeline_dag.py', '--cfg-path', '/tmp/tmp8o3yvhfp']
+[2026-04-18T12:52:11.864+0000] {standard_task_runner.py:88} INFO - Job 5: Subtask evaluate_model
+[2026-04-18T12:52:11.890+0000] {task_command.py:423} INFO - Running <TaskInstance: churn_prediction_pipeline.evaluate_model manual__2026-04-18T12:51:53.834388+00:00 [running]> on host 1dfe97885e66
+[2026-04-18T12:52:11.928+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-science' AIRFLOW_CTX_DAG_ID='churn_prediction_pipeline' AIRFLOW_CTX_TASK_ID='evaluate_model' AIRFLOW_CTX_EXECUTION_DATE='2026-04-18T12:51:53.834388+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-18T12:51:53.834388+00:00'
+[2026-04-18T12:52:12.416+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:52:12.416+0000] {logging_mixin.py:188} INFO -  TASK 3 — Evaluación del modelo
+[2026-04-18T12:52:12.417+0000] {logging_mixin.py:188} INFO -  Modelo: /opt/***/models/churn_model.pkl
+[2026-04-18T12:52:12.417+0000] {logging_mixin.py:188} INFO -  Data:   /opt/***/data/processed
+[2026-04-18T12:52:12.417+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:52:12.418+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:52:12.418+0000] {logging_mixin.py:188} INFO -  PASO 3 — EVALUACIÓN DEL MODELO
+[2026-04-18T12:52:12.418+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:52:12.418+0000] {logging_mixin.py:188} INFO - [EVAL] Cargando modelo desde: /opt/***/models/churn_model.pkl
+[2026-04-18T12:52:12.485+0000] {logging_mixin.py:188} INFO - [EVAL] Modelo cargado: XGBoost
+[2026-04-18T12:52:12.486+0000] {logging_mixin.py:188} INFO - [EVAL] Fecha de entrenamiento: 2026-04-18T12:52:11.148051
+[2026-04-18T12:52:12.486+0000] {logging_mixin.py:188} INFO - [EVAL] Features: 87
+[2026-04-18T12:52:12.487+0000] {logging_mixin.py:188} INFO - [EVAL] Cargando test set desde: /opt/***/data/processed
+[2026-04-18T12:52:12.595+0000] {logging_mixin.py:188} INFO - [EVAL] Test set: 15,000 filas x 87 columnas
+[2026-04-18T12:52:12.596+0000] {logging_mixin.py:188} INFO - [EVAL] Churn rate en test: 0.4956
+[2026-04-18T12:52:12.596+0000] {logging_mixin.py:188} INFO - [EVAL] Generando predicciones...
+[2026-04-18T12:52:12.644+0000] {logging_mixin.py:188} INFO - 
+======================================================================
+[2026-04-18T12:52:12.644+0000] {logging_mixin.py:188} INFO -  EVALUACIÓN FINAL — HOLDOUT TEST SET
+[2026-04-18T12:52:12.645+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:52:12.645+0000] {logging_mixin.py:188} INFO - 
+  AUC-ROC:           0.6986
+[2026-04-18T12:52:12.646+0000] {logging_mixin.py:188} INFO -   Average Precision: 0.6856
+[2026-04-18T12:52:12.646+0000] {logging_mixin.py:188} INFO -   F1 Score:          0.6399
+[2026-04-18T12:52:12.647+0000] {logging_mixin.py:188} INFO -   Recall:            0.6415
+[2026-04-18T12:52:12.647+0000] {logging_mixin.py:188} INFO -   Precision:         0.6382
+[2026-04-18T12:52:12.647+0000] {logging_mixin.py:188} INFO -   Accuracy:          0.6421
+[2026-04-18T12:52:12.648+0000] {logging_mixin.py:188} INFO -   Threshold:         0.5
+[2026-04-18T12:52:12.648+0000] {logging_mixin.py:188} INFO - 
+  Confusion Matrix:
+[2026-04-18T12:52:12.648+0000] {logging_mixin.py:188} INFO -                     Pred No Churn    Pred Churn
+[2026-04-18T12:52:12.649+0000] {logging_mixin.py:188} INFO -     Real No Churn       4,863          2,703
+[2026-04-18T12:52:12.649+0000] {logging_mixin.py:188} INFO -     Real Churn          2,665          4,769
+[2026-04-18T12:52:12.650+0000] {logging_mixin.py:188} INFO - 
+  Comparación con Validation Set:
+[2026-04-18T12:52:12.650+0000] {logging_mixin.py:188} INFO -     AUC-ROC:  Val=0.6913  |  Test=0.6986  |  Delta=+0.0073
+[2026-04-18T12:52:12.651+0000] {logging_mixin.py:188} INFO -     F1:       Val=0.6376  |  Test=0.6399  |  Delta=+0.0023
+[2026-04-18T12:52:12.651+0000] {logging_mixin.py:188} INFO - 
+  Curva de Lift (valor para negocio):
+[2026-04-18T12:52:12.652+0000] {logging_mixin.py:188} INFO -     % Contactados   % Churners capturados    Lift    Churners
+[2026-04-18T12:52:12.652+0000] {logging_mixin.py:188} INFO -   ---------------  ----------------------  ------  ----------
+[2026-04-18T12:52:12.652+0000] {logging_mixin.py:188} INFO -                5%                    8.3%   1.67x    621/7434
+[2026-04-18T12:52:12.653+0000] {logging_mixin.py:188} INFO -               10%                   15.9%   1.59x   1184/7434
+[2026-04-18T12:52:12.653+0000] {logging_mixin.py:188} INFO -               15%                   23.0%   1.54x   1712/7434
+[2026-04-18T12:52:12.654+0000] {logging_mixin.py:188} INFO -               20%                   29.8%   1.49x   2215/7434
+[2026-04-18T12:52:12.654+0000] {logging_mixin.py:188} INFO -               25%                   36.1%   1.44x   2682/7434
+[2026-04-18T12:52:12.655+0000] {logging_mixin.py:188} INFO -               30%                   42.4%   1.41x   3153/7434
+[2026-04-18T12:52:12.655+0000] {logging_mixin.py:188} INFO -               40%                   54.0%   1.35x   4014/7434
+[2026-04-18T12:52:12.655+0000] {logging_mixin.py:188} INFO -               50%                   64.3%   1.29x   4782/7434
+[2026-04-18T12:52:12.656+0000] {logging_mixin.py:188} INFO - 
+======================================================================
+[2026-04-18T12:52:12.658+0000] {logging_mixin.py:188} INFO - [EVAL] Reporte guardado en: /opt/***/models/evaluation_report.json
+[2026-04-18T12:52:12.659+0000] {logging_mixin.py:188} INFO - 
+[EVAL] ✅ Evaluación completada exitosamente.
+[2026-04-18T12:52:12.659+0000] {logging_mixin.py:188} INFO - [DAG] ✅ Task 3 completada. Métricas logeadas y reporte guardado.
+[2026-04-18T12:52:12.660+0000] {python.py:201} INFO - Done. Returned value was: None
+[2026-04-18T12:52:12.665+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=churn_prediction_pipeline, task_id=evaluate_model, execution_date=20260418T125153, start_date=20260418T125211, end_date=20260418T125212
+[2026-04-18T12:52:12.716+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-04-18T12:52:12.725+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

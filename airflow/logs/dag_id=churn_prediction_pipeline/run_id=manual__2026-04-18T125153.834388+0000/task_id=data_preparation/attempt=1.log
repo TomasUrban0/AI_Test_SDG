@@ -1,0 +1,46 @@
+[2026-04-18T12:51:57.784+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: churn_prediction_pipeline.data_preparation manual__2026-04-18T12:51:53.834388+00:00 [queued]>
+[2026-04-18T12:51:57.789+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: churn_prediction_pipeline.data_preparation manual__2026-04-18T12:51:53.834388+00:00 [queued]>
+[2026-04-18T12:51:57.790+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2026-04-18T12:51:57.799+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): data_preparation> on 2026-04-18 12:51:53.834388+00:00
+[2026-04-18T12:51:57.809+0000] {standard_task_runner.py:60} INFO - Started process 217 to run task
+[2026-04-18T12:51:57.811+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'churn_prediction_pipeline', 'data_preparation', 'manual__2026-04-18T12:51:53.834388+00:00', '--job-id', '3', '--raw', '--subdir', 'DAGS_FOLDER/churn_pipeline_dag.py', '--cfg-path', '/tmp/tmp_zya_wil']
+[2026-04-18T12:51:57.813+0000] {standard_task_runner.py:88} INFO - Job 3: Subtask data_preparation
+[2026-04-18T12:51:57.844+0000] {task_command.py:423} INFO - Running <TaskInstance: churn_prediction_pipeline.data_preparation manual__2026-04-18T12:51:53.834388+00:00 [running]> on host 1dfe97885e66
+[2026-04-18T12:51:57.888+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-science' AIRFLOW_CTX_DAG_ID='churn_prediction_pipeline' AIRFLOW_CTX_TASK_ID='data_preparation' AIRFLOW_CTX_EXECUTION_DATE='2026-04-18T12:51:53.834388+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-18T12:51:53.834388+00:00'
+[2026-04-18T12:51:59.120+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:51:59.120+0000] {logging_mixin.py:188} INFO -  TASK 1 — Preparación de datos
+[2026-04-18T12:51:59.121+0000] {logging_mixin.py:188} INFO -  Input:  /opt/***/data/dataset.csv
+[2026-04-18T12:51:59.121+0000] {logging_mixin.py:188} INFO -  Output: /opt/***/data/processed
+[2026-04-18T12:51:59.121+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:51:59.121+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:51:59.121+0000] {logging_mixin.py:188} INFO -  PASO 1 — PREPARACIÓN DE DATOS
+[2026-04-18T12:51:59.122+0000] {logging_mixin.py:188} INFO - ======================================================================
+[2026-04-18T12:51:59.122+0000] {logging_mixin.py:188} INFO - [PREP] Cargando datos desde: /opt/***/data/dataset.csv
+[2026-04-18T12:52:00.261+0000] {logging_mixin.py:188} INFO - [PREP] Dataset cargado: 100,000 filas x 100 columnas
+[2026-04-18T12:52:00.304+0000] {logging_mixin.py:188} INFO - [PREP] Nulos camuflados reemplazados: 599,904 valores 'U'/'Z' → NaN
+[2026-04-18T12:52:00.356+0000] {logging_mixin.py:188} INFO - [PREP] Columnas eliminadas por exceso de nulos (>85%): ['kid0_2', 'kid3_5', 'kid6_10', 'kid11_15', 'kid16_17']
+[2026-04-18T12:52:00.361+0000] {logging_mixin.py:188} INFO - [PREP] eqpdays: 133 valores negativos → NaN
+[2026-04-18T12:52:01.159+0000] {logging_mixin.py:188} INFO - [PREP] Columnas eliminadas por redundancia (r>0.98): 10 → ['adjrev', 'attempt_Mean', 'avg3mou', 'cc_mou_Mean', 'comp_dat_Mean', 'comp_vce_Mean', 'ovrrev_Mean', 'plcd_vce_Mean', 'totcalls', 'totmou']
+[2026-04-18T12:52:01.516+0000] {logging_mixin.py:188} INFO - [PREP] Columnas eliminadas por varianza nula/sin señal: 4 → ['callfwdv_Mean', 'recv_sms_Mean', 'rv', 'truck']
+[2026-04-18T12:52:01.542+0000] {logging_mixin.py:188} INFO - [PREP] Features nuevas creadas: ['rev_per_minute', 'call_fail_rate', 'care_intensity', 'old_device', 'usage_drop_severe', 'rev_vs_avg3', 'new_customer', 'engagement_score']
+[2026-04-18T12:52:02.692+0000] {logging_mixin.py:188} INFO - [PREP] Encoding: 16 categóricas, 71 numéricas
+[2026-04-18T12:52:02.700+0000] {logging_mixin.py:188} INFO - [PREP] Nulos restantes: 0
+[2026-04-18T12:52:02.808+0000] {logging_mixin.py:188} INFO - [PREP] Split:
+[2026-04-18T12:52:02.809+0000] {logging_mixin.py:188} INFO -   Train:      70,040 (0.4956 churn)
+[2026-04-18T12:52:02.809+0000] {logging_mixin.py:188} INFO -   Validation: 14,960 (0.4957 churn)
+[2026-04-18T12:52:02.809+0000] {logging_mixin.py:188} INFO -   Test:       15,000 (0.4956 churn)
+[2026-04-18T12:52:05.672+0000] {logging_mixin.py:188} INFO - [PREP] Archivos guardados en: /opt/***/data/processed
+[2026-04-18T12:52:05.673+0000] {logging_mixin.py:188} INFO -   preprocessing_artifacts.pkl              7.4 KB
+[2026-04-18T12:52:05.675+0000] {logging_mixin.py:188} INFO -   X_test.csv                            7819.9 KB
+[2026-04-18T12:52:05.683+0000] {logging_mixin.py:188} INFO -   X_train.csv                          36495.9 KB
+[2026-04-18T12:52:05.683+0000] {logging_mixin.py:188} INFO -   X_val.csv                             7790.8 KB
+[2026-04-18T12:52:05.684+0000] {logging_mixin.py:188} INFO -   y_test.csv                              29.3 KB
+[2026-04-18T12:52:05.684+0000] {logging_mixin.py:188} INFO -   y_train.csv                            136.8 KB
+[2026-04-18T12:52:05.685+0000] {logging_mixin.py:188} INFO -   y_val.csv                               29.2 KB
+[2026-04-18T12:52:05.685+0000] {logging_mixin.py:188} INFO - 
+[PREP] ✅ Preparación de datos completada exitosamente.
+[2026-04-18T12:52:05.691+0000] {logging_mixin.py:188} INFO - [DAG] ✅ Task 1 completada. Archivos verificados.
+[2026-04-18T12:52:05.691+0000] {python.py:201} INFO - Done. Returned value was: None
+[2026-04-18T12:52:05.695+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=churn_prediction_pipeline, task_id=data_preparation, execution_date=20260418T125153, start_date=20260418T125157, end_date=20260418T125205
+[2026-04-18T12:52:05.745+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-04-18T12:52:05.761+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

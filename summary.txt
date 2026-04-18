@@ -102,3 +102,37 @@ Multicolinealidad extrema: 19 pares con r > 0.95, incluso totcalls ↔ adjqty = 
 change_mou (tu predictor estrella) es posible leakage. La descripción no aclara si la medición del "monthly MoU" se solapa con la ventana de churn. Recomiendo entrenar con y sin la variable y reportar el delta de AUC.
 income no es el ingreso en dólares, es una variable ordinal 1–9.
 crclscod tiene 54 categorías — one-hot no es viable, hay que hacer target encoding.
+
+---- Creacion de los 3 scripts
+
+AI_Test_SDG/
+├── scripts/
+│   ├── data_preparation.py   (12 KB)
+│   ├── train_model.py        (7.8 KB)
+│   └── evaluate_model.py     (8.0 KB)
+├── data/
+│   ├── dataset.csv           (input original)
+│   └── processed/            (generado por paso 1)
+│       ├── X_train.csv, X_val.csv, X_test.csv
+│       ├── y_train.csv, y_val.csv, y_test.csv
+│       └── preprocessing_artifacts.pkl
+└── models/                   (generado por pasos 2 y 3)
+    ├── churn_model.pkl
+    └── evaluation_report.json
+
+Qué hace cada script:
+
+- data_preparation.py — Carga dataset.csv, aplica las 5 limpiezas de trampas (nulos camuflados, columnas >85% nulas, 
+eqpdays negativos, redundancia r>0.98, varianza cero), crea las 8 features nuevas, hace label encoding + imputación con mediana,
+split estratificado 70/15/15, y guarda todo. Acepta --input y --output como argumentos.
+
+- train_model.py — Carga los datos procesados, entrena XGBoost (con flag --tune opcional para hacer RandomizedSearchCV), 
+evalúa en validation como sanity check, y guarda el modelo como pickle con todos los artefactos incluidos.
+
+- evaluate_model.py — Carga el pickle y el test set, calcula todas las métricas (AUC-ROC, F1, recall, precision, confusion matrix), 
+genera la curva de lift completa (5%-50%), compara contra validation, y guarda un evaluation_report.json. 
+Incluye un gate de calidad: si AUC < 0.55, retorna error.
+
+Pipeline verificado end-to-end:
+data_preparation.py  →  train_model.py  →  evaluate_model.py
+       (16s)                (4.5s)              (1s)

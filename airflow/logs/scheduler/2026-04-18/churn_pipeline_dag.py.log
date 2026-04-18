@@ -1,0 +1,109 @@
+[2026-04-18T12:50:57.882+0000] {processor.py:161} INFO - Started process (PID=182) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:50:57.883+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:50:57.884+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:50:57.883+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:50:57.908+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:50:58.039+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:50:58.039+0000] {override.py:1769} INFO - Created Permission View: can delete on DAG:churn_prediction_pipeline
+[2026-04-18T12:50:58.046+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:50:58.046+0000] {override.py:1769} INFO - Created Permission View: can edit on DAG:churn_prediction_pipeline
+[2026-04-18T12:50:58.052+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:50:58.052+0000] {override.py:1769} INFO - Created Permission View: can read on DAG:churn_prediction_pipeline
+[2026-04-18T12:50:58.052+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:50:58.052+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:50:58.059+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:50:58.059+0000] {dag.py:3058} INFO - Creating ORM DAG for churn_prediction_pipeline
+[2026-04-18T12:50:58.059+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:50:58.059+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:50:58.073+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.193 seconds
+[2026-04-18T12:51:28.746+0000] {processor.py:161} INFO - Started process (PID=211) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:51:28.746+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:51:28.747+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:51:28.747+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:51:28.764+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:51:28.783+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:51:28.783+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:51:28.791+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:51:28.791+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:51:28.807+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.065 seconds
+[2026-04-18T12:51:59.577+0000] {processor.py:161} INFO - Started process (PID=244) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:51:59.578+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:51:59.579+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:51:59.578+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:51:59.591+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:51:59.609+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:51:59.608+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:51:59.616+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:51:59.616+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:51:59.628+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.053 seconds
+[2026-04-18T12:52:30.394+0000] {processor.py:161} INFO - Started process (PID=331) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:52:30.395+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:52:30.396+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:52:30.395+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:52:30.409+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:52:30.426+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:52:30.426+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:52:30.434+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:52:30.433+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:52:30.447+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.056 seconds
+[2026-04-18T12:53:02.325+0000] {processor.py:161} INFO - Started process (PID=342) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:53:02.326+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:53:02.327+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:53:02.327+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:53:02.341+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:53:02.357+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:53:02.357+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:53:02.364+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:53:02.363+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:53:02.377+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.053 seconds
+[2026-04-18T12:53:35.183+0000] {processor.py:161} INFO - Started process (PID=353) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:53:35.184+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:53:35.184+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:53:35.184+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:53:35.202+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:53:35.223+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:53:35.223+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:53:35.231+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:53:35.231+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:53:35.248+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.068 seconds
+[2026-04-18T12:54:08.107+0000] {processor.py:161} INFO - Started process (PID=364) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:54:08.108+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:54:08.109+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:54:08.109+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:54:08.123+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:54:08.143+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:54:08.143+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:54:08.153+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:54:08.153+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:54:08.170+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.064 seconds
+[2026-04-18T12:54:40.958+0000] {processor.py:161} INFO - Started process (PID=375) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:54:40.959+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:54:40.960+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:54:40.960+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:54:40.981+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:54:41.001+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:54:41.001+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:54:41.009+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:54:41.009+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:54:41.028+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.071 seconds
+[2026-04-18T12:55:13.846+0000] {processor.py:161} INFO - Started process (PID=386) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:55:13.846+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:55:13.847+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:55:13.847+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:55:13.859+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:55:13.874+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:55:13.874+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:55:13.880+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:55:13.880+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:55:13.893+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.050 seconds
+[2026-04-18T12:55:44.716+0000] {processor.py:161} INFO - Started process (PID=397) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:55:44.717+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:55:44.717+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:55:44.717+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:55:44.730+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:55:44.746+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:55:44.746+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:55:44.753+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:55:44.753+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:55:44.766+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.051 seconds
+[2026-04-18T12:56:15.218+0000] {processor.py:161} INFO - Started process (PID=408) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:56:15.219+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:56:15.220+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:56:15.220+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:56:15.237+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:56:15.256+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:56:15.256+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:56:15.264+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:56:15.264+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:56:15.280+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.064 seconds
+[2026-04-18T12:56:45.382+0000] {processor.py:161} INFO - Started process (PID=419) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:56:45.383+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:56:45.384+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:56:45.384+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:56:45.398+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:56:45.415+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:56:45.415+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:56:45.422+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:56:45.422+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:56:45.435+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.055 seconds
+[2026-04-18T12:57:15.591+0000] {processor.py:161} INFO - Started process (PID=430) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:57:15.592+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:57:15.593+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:57:15.592+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:57:15.603+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:57:15.617+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:57:15.617+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:57:15.624+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:57:15.624+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:57:15.638+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.048 seconds
+[2026-04-18T12:57:46.452+0000] {processor.py:161} INFO - Started process (PID=441) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:57:46.453+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:57:46.453+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:57:46.453+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:57:46.465+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:57:46.479+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:57:46.479+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:57:46.486+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:57:46.486+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:57:46.498+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.048 seconds
+[2026-04-18T12:58:17.374+0000] {processor.py:161} INFO - Started process (PID=452) to work on /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:58:17.375+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/churn_pipeline_dag.py for tasks to queue
+[2026-04-18T12:58:17.376+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:58:17.376+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:58:17.392+0000] {processor.py:840} INFO - DAG(s) 'churn_prediction_pipeline' retrieved from /opt/airflow/dags/churn_pipeline_dag.py
+[2026-04-18T12:58:17.411+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:58:17.411+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-04-18T12:58:17.419+0000] {logging_mixin.py:188} INFO - [2026-04-18T12:58:17.419+0000] {dag.py:3823} INFO - Setting next_dagrun for churn_prediction_pipeline to None, run_after=None
+[2026-04-18T12:58:17.434+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/churn_pipeline_dag.py took 0.062 seconds
