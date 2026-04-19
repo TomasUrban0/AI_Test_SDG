@@ -1,0 +1,11 @@
+Preguntar por presentacion:
+    - Extension
+    - Al hacer presentaciones para sdg tenian un modelo base de presentaciones, 
+        tengo algo similar que me podais dar?
+
+Preguntar si los resultados actuales (los valores) valen.
+Observaciones:
+    Las columnas kid0_2 a kid16_17 usan 'U' como null y Otros campos usan 'Z'.
+    Dias de antiguedad del equipo con valores negativos
+    Algunas columnas con >85% nulos
+
