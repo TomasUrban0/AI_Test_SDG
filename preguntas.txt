@@ -14,15 +14,15 @@ Observaciones:
 Buenas! Disculpa las molestias, me han surgido un par de dudas sobre la prueba técnica y quería consultaros antes de seguir avanzando.
 Sobre la presentación:
 
-¿Tenéis alguna preferencia de extensión o duración? (número de slides orientativo, minutos, etc.)
+¿Tenéis alguna preferencia de extensión o duración? (número de slides orientativo)
 ¿Manejáis alguna plantilla o modelo base de presentaciones en SDG que me podáis pasar? Así lo adapto a vuestro formato.
 
 Sobre los resultados del modelo:
 
-He obtenido un AUC-ROC de ~0.70 y un F1 de ~0.64 sobre el test set. ¿Son valores dentro de lo esperado para este dataset o buscáis un umbral mínimo concreto?
+Por ahora he obtenido un AUC-ROC de ~0.70 y un F1 de ~0.64 sobre el test set. ¿Entiendo que no son valores muy altos, pero estan dentro de lo esperado para este dataset o buscáis un umbral mínimo concreto?
 
-Y por último, algunas observaciones sobre el dataset (por si os sirve como feedback o es intencionado):
+Y por último, algunas observaciones sobre el dataset que si no me equivoco he podido ver:
 
-Las columnas kid0_2 a kid16_17 tienen 'U' como valor en >90% de los casos, y otros campos usan 'Z' — los he tratado como nulos camuflados.
+Las columnas kid0_2 a kid16_17 tienen datos como 'U' en un 90% de los casos, y otros campos usan 'Z' — (los he tratado como nulos).
 He encontrado valores negativos en eqpdays (días de antigüedad del equipo), que no deberían existir físicamente.
-Varias columnas tienen más del 85% de nulos.
+Varias columnas tienen más del 85 % de nulos.
