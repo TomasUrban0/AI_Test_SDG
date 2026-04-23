@@ -14,13 +14,15 @@
    3. Aplica feature engineering (8 features nuevas).
    4. Codifica categóricas (LabelEncoder) e imputa nulos (mediana).
    5. Hace un split estratificado 70/15/15 (train/val/test).
-   6. Guarda los artefactos en la carpeta de salida.
+   6. Guarda los artefactos en la carpeta de salida (CSV + pickle).
+   7. [Extensión] Persiste las features procesadas en PostgreSQL (churn_db).
 
  Outputs:
    - X_train.csv, y_train.csv
    - X_val.csv, y_val.csv
    - X_test.csv, y_test.csv
    - preprocessing_artifacts.pkl  (encoders, imputer, scaler, etc.)
+   - [PostgreSQL] Tabla processed_features en churn_db
 
  Uso:
    python data_preparation.py --input ../data/dataset.csv --output ../data/processed/
@@ -272,6 +274,33 @@ def save_outputs(output_dir, X_train, X_val, X_test, y_train, y_val, y_test, art
 # =====================================================================
 # Main
 # =====================================================================
+def persist_to_database(run_id, X_train, y_train, X_val, y_val, X_test, y_test):
+    """
+    [Extensión 3.6] Persiste las features procesadas en PostgreSQL.
+    Modo graceful: si la DB no está disponible, simplemente se salta.
+    """
+    try:
+        from db_utils import get_engine, save_features_to_db
+        engine = get_engine()
+        if engine is not None:
+            ok = save_features_to_db(
+                engine, run_id,
+                X_train, y_train,
+                X_val, y_val,
+                X_test, y_test,
+            )
+            if ok:
+                print(f"[PREP] ✅ Features guardadas en PostgreSQL (run: {run_id})")
+            else:
+                print("[PREP] ⚠️  No se pudieron guardar las features en PostgreSQL.")
+        else:
+            print("[PREP] ℹ️  PostgreSQL no disponible. Continuando solo con CSVs.")
+    except ImportError:
+        print("[PREP] ℹ️  db_utils no disponible. Continuando solo con CSVs.")
+    except Exception as e:
+        print(f"[PREP] ⚠️  Error de DB (no crítico): {e}")
+
+
 def main(input_path: str, output_dir: str):
     print("=" * 70)
     print(" PASO 1 — PREPARACIÓN DE DATOS")
@@ -304,8 +333,15 @@ def main(input_path: str, output_dir: str):
     # 6. Split
     X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
 
-    # 7. Guardar
+    # 7. Guardar CSVs (siempre — es el fallback principal)
     save_outputs(output_dir, X_train, X_val, X_test, y_train, y_val, y_test, artifacts)
+
+    # 8. [Extensión] Persistir en PostgreSQL
+    run_id = os.environ.get('CHURN_RUN_ID', '')
+    if not run_id:
+        from datetime import datetime
+        run_id = f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    persist_to_database(run_id, X_train, y_train, X_val, y_val, X_test, y_test)
 
     print("\n[PREP] ✅ Preparación de datos completada exitosamente.")
     return 0

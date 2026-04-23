@@ -10,9 +10,10 @@
    4. Calcula métricas completas:
       - AUC-ROC, Average Precision, F1, Recall, Precision, Accuracy
       - Confusion Matrix
-      - Curva de Lift (top-10%, 20%, 30%)
+      - Curva de Lift (top-5%, 10%, 15%, 20%, 25%, 30%, 40%, 50%)
    5. Imprime todo en logs (para que Airflow lo capture).
    6. Opcionalmente guarda un reporte JSON con las métricas.
+   7. [Extensión] Persiste métricas y predicciones en PostgreSQL (churn_db).
 
  Inputs:
    - models/churn_model.pkl
@@ -21,6 +22,7 @@
  Outputs:
    - Métricas impresas en stdout/logs
    - (Opcional) models/evaluation_report.json
+   - [PostgreSQL] Tablas model_runs y model_predictions en churn_db
 
  Uso:
    python evaluate_model.py --model ../models/churn_model.pkl --data ../data/processed/
@@ -175,6 +177,43 @@ def save_report(metrics: dict, lift: dict, output_path: str):
 # =====================================================================
 # Main
 # =====================================================================
+def persist_to_database(run_id, metrics, lift, y_proba, y_pred, y_test,
+                        model_name, hyperparameters, n_rows, n_features,
+                        churn_rate, model_path):
+    """
+    [Extensión 3.6] Persiste métricas y predicciones en PostgreSQL.
+    Modo graceful: si la DB no está disponible, simplemente se salta.
+    """
+    try:
+        from db_utils import get_engine, save_run_metrics, save_predictions_to_db
+        engine = get_engine()
+        if engine is not None:
+            # Guardar métricas del run
+            ok_metrics = save_run_metrics(
+                engine, run_id, metrics, lift,
+                model_name=model_name,
+                hyperparameters=hyperparameters,
+                n_rows=n_rows,
+                n_features=n_features,
+                churn_rate=churn_rate,
+                model_path=model_path,
+            )
+            # Guardar predicciones por cliente
+            ok_preds = save_predictions_to_db(
+                engine, run_id, y_proba, y_pred, y_actual=y_test
+            )
+            if ok_metrics and ok_preds:
+                print(f"[EVAL] ✅ Métricas y predicciones guardadas en PostgreSQL (run: {run_id})")
+            else:
+                print("[EVAL] ⚠️  Guardado parcial en PostgreSQL.")
+        else:
+            print("[EVAL] ℹ️  PostgreSQL no disponible. Solo se guarda JSON.")
+    except ImportError:
+        print("[EVAL] ℹ️  db_utils no disponible. Solo se guarda JSON.")
+    except Exception as e:
+        print(f"[EVAL] ⚠️  Error de DB (no crítico): {e}")
+
+
 def main(model_path: str, data_dir: str, save_json: bool = True):
     print("=" * 70)
     print(" PASO 3 — EVALUACIÓN DEL MODELO")
@@ -190,6 +229,7 @@ def main(model_path: str, data_dir: str, save_json: bool = True):
     # 3. Predecir
     print("[EVAL] Generando predicciones...")
     y_proba = model.predict_proba(X_test)[:, 1]
+    y_pred = (y_proba >= 0.5).astype(int)
 
     # 4. Calcular métricas
     metrics = compute_metrics(y_test, y_proba, threshold=0.5)
@@ -205,7 +245,26 @@ def main(model_path: str, data_dir: str, save_json: bool = True):
         report_path = os.path.join(report_dir, 'evaluation_report.json')
         save_report(metrics, lift, report_path)
 
-    # 7. Verificar que el modelo es mínimamente funcional
+    # 7. [Extensión] Persistir en PostgreSQL
+    run_id = os.environ.get('CHURN_RUN_ID', '')
+    if not run_id:
+        run_id = f"run_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}"
+    persist_to_database(
+        run_id=run_id,
+        metrics=metrics,
+        lift=lift,
+        y_proba=y_proba,
+        y_pred=y_pred,
+        y_test=y_test,
+        model_name=package.get('model_name', 'XGBoost'),
+        hyperparameters=package.get('best_params', {}),
+        n_rows=X_test.shape[0],
+        n_features=X_test.shape[1],
+        churn_rate=float(y_test.mean()),
+        model_path=model_path,
+    )
+
+    # 8. Verificar que el modelo es mínimamente funcional
     if metrics['auc_roc'] < 0.55:
         print("\n[EVAL] ⚠️  ALERTA: AUC-ROC < 0.55 — el modelo apenas supera el azar.")
         print("[EVAL] Revisar el preprocesamiento y el entrenamiento.")

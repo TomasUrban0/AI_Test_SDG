@@ -34,6 +34,12 @@ x-airflow-common:
     CHURN_DATA_DIR: /opt/airflow/data
     CHURN_SCRIPTS_DIR: /opt/airflow/scripts
     CHURN_MODELS_DIR: /opt/airflow/models
+    # Extensión 3.6: PostgreSQL para persistencia de datos del pipeline
+    CHURN_DB_HOST: postgres
+    CHURN_DB_PORT: '5432'
+    CHURN_DB_NAME: churn_db
+    CHURN_DB_USER: airflow
+    CHURN_DB_PASSWORD: airflow
     _PIP_ADDITIONAL_REQUIREMENTS: ''
   volumes:
     - ./dags:/opt/airflow/dags
@@ -58,8 +64,11 @@ services:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
+      # Extensión 3.6: permite crear múltiples DBs
+      POSTGRES_MULTIPLE_DATABASES: churn_db
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d    # Script de init para churn_db
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s

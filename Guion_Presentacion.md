@@ -198,21 +198,21 @@
 
 ## Diapositiva 13 — Metricas Finales en Test Set (2.5 minutos)
 
-**Lo que se ve:** 4 tarjetas grandes con AUC-ROC 0.7023, F1 0.6448, Recall 0.6476, Precision 0.6420 + confusion matrix + interpretacion.
+**Lo que se ve:** 4 tarjetas grandes con AUC-ROC 0.6986, F1 0.6399, Recall 0.6415, Precision 0.6382 + confusion matrix + interpretacion.
 
 **Que decir:**
 
 > "Estos son los resultados finales sobre el test set, que el modelo nunca vio durante el entrenamiento.
 >
-> **AUC-ROC de 0.7023**: esto indica una capacidad discriminativa moderada-buena. Puede parecer modesto, pero hay que tener en cuenta que estamos trabajando con un dataset de 100 columnas llenas de trampas y ruido. Un AUC de 0.70 sobre datos limpios y con features interpretables es un resultado solido.
+> **AUC-ROC de 0.6986**: esto indica una capacidad discriminativa moderada-buena. Puede parecer modesto, pero hay que tener en cuenta que estamos trabajando con un dataset de 100 columnas llenas de trampas y ruido. Un AUC de ~0.70 sobre datos limpios y con features interpretables es un resultado solido.
 >
-> **F1 Score de 0.6448**: equilibra precision y recall. En nuestro caso, ambas estan bastante parejas, lo cual es bueno.
+> **F1 Score de 0.6399**: equilibra precision y recall. En nuestro caso, ambas estan bastante parejas, lo cual es bueno.
 >
-> **Recall de 0.6476**: de cada 100 clientes que realmente van a hacer churn, nuestro modelo identifica 65. Los otros 35 se nos escapan. En negocio, esto significa que capturamos casi dos tercios de los churners.
+> **Recall de 0.6415**: de cada 100 clientes que realmente van a hacer churn, nuestro modelo identifica ~64. Los otros 36 se nos escapan. En negocio, esto significa que capturamos casi dos tercios de los churners.
 >
-> **Precision de 0.6420**: de cada 100 clientes que el modelo marca como "va a hacer churn", 64 realmente lo hacen. Los otros 36 son falsos positivos, clientes que recibirian una oferta de retencion innecesaria.
+> **Precision de 0.6382**: de cada 100 clientes que el modelo marca como "va a hacer churn", ~64 realmente lo hacen. Los otros 36 son falsos positivos, clientes que recibirian una oferta de retencion innecesaria.
 >
-> Si miramos la confusion matrix: de 7.500 clientes en test que realmente hicieron churn, identificamos 4.856 (los true positives). Y de los 7.500 que no hicieron churn, clasificamos correctamente 4.718.
+> Si miramos la confusion matrix: de los ~7.434 clientes en test que realmente hicieron churn, identificamos 4.769 (los true positives). Y de los 7.566 que no hicieron churn, clasificamos correctamente 4.863.
 >
 > Un punto importante: el threshold de 0.50 es ajustable. Dependiendo de si el negocio prefiere maximizar recall (no perder ningun churner, aunque contactemos a algunos que no lo son) o precision (contactar solo a los seguros), podemos moverlo."
 
@@ -273,9 +273,9 @@
 
 > "La curva de lift es probablemente la metrica mas relevante para el negocio. Responde a una pregunta directa: si solo puedo contactar a un porcentaje de mis clientes, ¿cuantos churners voy a capturar?
 >
-> La linea azul es nuestro modelo y la gris es el baseline aleatorio. Si contactamos al azar al 10% de los clientes, capturaremos el 10% de los churners. Con nuestro modelo, contactando al top 10% de clientes por riesgo segun el modelo, capturamos un 16% de los churners. Eso es un **lift de 1.62x**, es decir, un 62% mas eficiente que contactar al azar.
+> La linea azul es nuestro modelo y la gris es el baseline aleatorio. Si contactamos al azar al 10% de los clientes, capturaremos el 10% de los churners. Con nuestro modelo, contactando al top 10% de clientes por riesgo segun el modelo, capturamos un ~16% de los churners. Eso es un **lift de 1.59x**, es decir, un 59% mas eficiente que contactar al azar.
 >
-> En la practica, si una telco tiene 10 millones de clientes y un churn mensual del 2%, eso son 200.000 churners al mes. Contactar al azar al 10% (1 millon de clientes) capturaria 20.000. Con nuestro modelo, capturariamos 32.000 con el mismo esfuerzo. Son 12.000 clientes mas retenidos por mes.
+> En la practica, si una telco tiene 10 millones de clientes y un churn mensual del 2%, eso son 200.000 churners al mes. Contactar al azar al 10% (1 millon de clientes) capturaria 20.000. Con nuestro modelo, capturariamos ~31.800 con el mismo esfuerzo. Son ~11.800 clientes mas retenidos por mes.
 >
 > Si el ARPU (ingreso medio por usuario) es de 30 euros al mes, esos 12.000 clientes extra representan 360.000 euros mensuales en ingresos retenidos. Descontando el coste de las campanas de retencion, el ROI suele ser positivo contactando al top 20-30%."
 
@@ -291,7 +291,7 @@
 >
 > El argumento seria: si change_mou representa el cambio en uso DESPUES de que el cliente ya decidio irse, entonces estariamos haciendo trampa. El modelo estaria usando informacion del futuro para predecir algo que ya paso.
 >
-> Para verificarlo, hicimos un estudio de ablacion: entrenamos el modelo completo quitando change_mou y comparamos las metricas. El AUC cayo de 0.7023 a aproximadamente 0.67, un delta de solo 3 puntos porcentuales. El F1 cayo similarmente unos 2.5 puntos.
+> Para verificarlo, hicimos un estudio de ablacion: entrenamos el modelo completo quitando change_mou y comparamos las metricas. El AUC cayo de 0.6986 a aproximadamente 0.67, un delta de solo ~3 puntos porcentuales. El F1 cayo similarmente unos 2 puntos.
 >
 > Nuestra regla: si el delta fuera mayor a 5 puntos porcentuales, seria sospechoso de leakage. Con un delta de 3pp, concluimos que change_mou es una señal legitima de comportamiento previo al churn, no informacion del futuro. El cliente empieza a usar menos el servicio antes de irse, y eso es lo que estamos capturando."
 
@@ -371,7 +371,7 @@
 
 **Que decir:**
 
-> "Resumiendo lo que hemos construido: un EDA profundo con deteccion de mas de 13 trampas, 8 features nuevas con logica de negocio, un XGBoost tuneado con AUC de 0.70 y lift de 1.62x, interpretabilidad con SHAP, un estudio de ablacion para validar que no hay leakage, 3 scripts modulares y testeados end-to-end, y un DAG de Airflow con Docker listo para desplegar.
+> "Resumiendo lo que hemos construido: un EDA profundo con deteccion de mas de 13 trampas, 8 features nuevas con logica de negocio, un XGBoost tuneado con AUC de ~0.70 y lift de 1.59x, interpretabilidad con SHAP, un estudio de ablacion para validar que no hay leakage, 3 scripts modulares y testeados end-to-end, y un DAG de Airflow con Docker listo para desplegar.
 >
 > Para **siguientes pasos**, hay varias extensiones que aportarian valor:
 >

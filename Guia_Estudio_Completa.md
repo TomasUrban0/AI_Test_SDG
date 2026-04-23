@@ -189,7 +189,7 @@ El 0.176 que aparece en el codigo se calcula asi: queremos 15% del total como va
 
 **Que es**: eXtreme Gradient Boosting. Construye arboles secuencialmente, donde cada nuevo arbol corrige los errores del anterior. Optimiza una funcion de perdida mediante gradient descent en el espacio de funciones.
 
-**AUC**: 0.694 (antes de tuning) → 0.7023 (despues de tuning en test).
+**AUC**: 0.694 (antes de tuning) → 0.6986 (despues de tuning en test).
 
 **Hiperparametros clave y que hacen**:
 
@@ -277,15 +277,15 @@ Alternativas que se podrian haber usado:
 
 |  | Pred: No Churn | Pred: Churn |
 |--|---------------|-------------|
-| **Real: No Churn** | TN (True Negative) = 4,718 | FP (False Positive) = 2,782 |
-| **Real: Churn** | FN (False Negative) = 2,644 | TP (True Positive) = 4,856 |
+| **Real: No Churn** | TN (True Negative) = 4,863 | FP (False Positive) = 2,703 |
+| **Real: Churn** | FN (False Negative) = 2,665 | TP (True Positive) = 4,769 |
 
 - **TP**: Churners correctamente identificados → recibirán campana de retención.
 - **TN**: No-churners correctamente ignorados → no gastamos en ellos.
 - **FP**: No-churners marcados como churn → recibirán campana innecesaria (coste de retencion sin beneficio).
 - **FN**: Churners no detectados → se pierden (coste de oportunidad perdida).
 
-### 7.2 AUC-ROC (0.7023)
+### 7.2 AUC-ROC (0.6986)
 
 La curva ROC grafica TPR (Recall) vs FPR (1-Especificidad) para todos los thresholds posibles de 0 a 1.
 
@@ -293,27 +293,27 @@ La curva ROC grafica TPR (Recall) vs FPR (1-Especificidad) para todos los thresh
 - AUC = 0.5: modelo aleatorio (no discrimina).
 - AUC = 0.7: capacidad discriminativa moderada-buena.
 
-**Interpretacion intuitiva**: Si tomas un cliente que realmente hara churn y uno que no, hay un 70.23% de probabilidad de que el modelo asigne mayor probabilidad de churn al primero.
+**Interpretacion intuitiva**: Si tomas un cliente que realmente hara churn y uno que no, hay un 69.86% de probabilidad de que el modelo asigne mayor probabilidad de churn al primero.
 
-### 7.3 Precision (0.6420)
+### 7.3 Precision (0.6382)
 
-**Formula**: TP / (TP + FP) = 4,856 / (4,856 + 2,782) = 0.6420
+**Formula**: TP / (TP + FP) = 4,769 / (4,769 + 2,703) = 0.6382
 
-**En español**: De cada 100 clientes que el modelo dice "va a hacer churn", 64 realmente lo hacen.
+**En español**: De cada 100 clientes que el modelo dice "va a hacer churn", ~64 realmente lo hacen.
 
-**Implicacion de negocio**: Si envias una oferta de retencion de 50€ a cada cliente marcado, el 36% del gasto es "desperdiciado" en clientes que no iban a irse. Pero ojo: esos clientes pueden percibir positivamente la oferta, asi que no todo es perdida.
+**Implicacion de negocio**: Si envias una oferta de retencion de 50€ a cada cliente marcado, el ~36% del gasto es "desperdiciado" en clientes que no iban a irse. Pero ojo: esos clientes pueden percibir positivamente la oferta, asi que no todo es perdida.
 
-### 7.4 Recall / Sensibilidad (0.6476)
+### 7.4 Recall / Sensibilidad (0.6415)
 
-**Formula**: TP / (TP + FN) = 4,856 / (4,856 + 2,644) = 0.6476
+**Formula**: TP / (TP + FN) = 4,769 / (4,769 + 2,665) = 0.6415
 
-**En español**: De cada 100 clientes que realmente van a hacer churn, identificamos 65. Los otros 35 se nos escapan.
+**En español**: De cada 100 clientes que realmente van a hacer churn, identificamos ~64. Los otros 36 se nos escapan.
 
 **Implicacion de negocio**: Cada churner no detectado es un ingreso perdido. Si el ARPU es 30€/mes y el lifetime value es de 3 años, un churner perdido vale ~1,080€.
 
-### 7.5 F1-Score (0.6448)
+### 7.5 F1-Score (0.6399)
 
-**Formula**: 2 × (Precision × Recall) / (Precision + Recall) = 2 × (0.642 × 0.648) / (0.642 + 0.648) = 0.6448
+**Formula**: 2 × (Precision × Recall) / (Precision + Recall) = 2 × (0.6382 × 0.6415) / (0.6382 + 0.6415) = 0.6399
 
 La **media armonica** penaliza valores bajos mas que la media aritmetica. Si precision fuera 0.9 y recall 0.1, la media seria 0.5 pero el F1 seria 0.18. Esto refleja mejor que un modelo tan desequilibrado no es util.
 
@@ -335,13 +335,13 @@ La lift curve mide cuantas veces mejor es nuestro modelo respecto a seleccionar 
 **Formula**: Lift@k% = (% churners capturados en top k%) / k%
 
 Nuestros resultados:
-- Top 5%: Lift 1.72x (72% mejor que azar)
-- Top 10%: Lift 1.62x
-- Top 20%: Lift 1.50x
-- Top 30%: Lift 1.40x
-- Top 50%: Lift 1.25x
+- Top 5%: Lift 1.67x (67% mejor que azar)
+- Top 10%: Lift 1.59x
+- Top 20%: Lift 1.49x
+- Top 30%: Lift 1.41x
+- Top 50%: Lift 1.29x
 
-**Interpretacion para negocio**: "Si solo podemos llamar al 10% de nuestros clientes, ¿a cuales llamamos?" Con el modelo, contactando al top 10% capturamos un 62% mas de churners que contactando al azar.
+**Interpretacion para negocio**: "Si solo podemos llamar al 10% de nuestros clientes, ¿a cuales llamamos?" Con el modelo, contactando al top 10% capturamos un 59% mas de churners que contactando al azar.
 
 ---
 
@@ -528,7 +528,7 @@ En ML, un estudio de ablacion consiste en eliminar componentes del modelo uno a 
 3. Evaluar ambos en el mismo test set.
 4. Comparar AUC-ROC.
 
-**Resultado**: AUC_A = 0.7023, AUC_B ≈ 0.67, Delta ≈ 3 pp.
+**Resultado**: AUC_A = 0.6986, AUC_B ≈ 0.67, Delta ≈ 3 pp.
 
 **Regla de decision**: Si delta > 5-10 pp, la feature probablemente es leakage (el modelo depende demasiado de ella). Si delta < 5 pp, la feature es una señal legitima que mejora marginalmente.
 

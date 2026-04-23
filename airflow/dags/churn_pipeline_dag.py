@@ -52,6 +52,17 @@ sys.path.insert(0, SCRIPTS_DIR)
 # Funciones que ejecuta cada task
 # =====================================================================
 
+def _set_shared_run_id(**context):
+    """Genera un run_id compartido y lo inyecta como variable de entorno."""
+    from datetime import datetime as dt
+    run_id = f"run_{dt.now().strftime('%Y%m%d_%H%M%S')}"
+    os.environ['CHURN_RUN_ID'] = run_id
+    # También lo pasa via XCom para que los tasks downstream lo hereden
+    context['ti'].xcom_push(key='churn_run_id', value=run_id)
+    print(f"[DAG] Run ID compartido: {run_id}")
+    return run_id
+
+
 def run_data_preparation(**context):
     """
     TASK 1: Preparación de datos.
@@ -64,6 +75,10 @@ def run_data_preparation(**context):
     Output: data/processed/ con X_train, X_val, X_test, y_*, artifacts
     """
     from data_preparation import main as prep_main
+
+    # Generar run_id compartido para todo el pipeline
+    run_id = _set_shared_run_id(**context)
+    print(f"[DAG] CHURN_RUN_ID = {run_id}")
 
     print("=" * 70)
     print(f" TASK 1 — Preparación de datos")
@@ -103,6 +118,12 @@ def run_train_model(**context):
     """
     from train_model import main as train_main
 
+    # Heredar run_id del task anterior
+    run_id = context['ti'].xcom_pull(task_ids='data_preparation', key='churn_run_id')
+    if run_id:
+        os.environ['CHURN_RUN_ID'] = run_id
+        print(f"[DAG] CHURN_RUN_ID = {run_id}")
+
     print("=" * 70)
     print(f" TASK 2 — Entrenamiento del modelo")
     print(f" Input:  {PROCESSED_DIR}")
@@ -139,6 +160,12 @@ def run_evaluate_model(**context):
     Las métricas quedan visibles en los logs del task en la UI de Airflow.
     """
     from evaluate_model import main as eval_main
+
+    # Heredar run_id del task inicial
+    run_id = context['ti'].xcom_pull(task_ids='data_preparation', key='churn_run_id')
+    if run_id:
+        os.environ['CHURN_RUN_ID'] = run_id
+        print(f"[DAG] CHURN_RUN_ID = {run_id}")
 
     print("=" * 70)
     print(f" TASK 3 — Evaluación del modelo")
