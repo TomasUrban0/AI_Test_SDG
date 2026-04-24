@@ -110,3 +110,10 @@ ORDER BY mp.churn_proba DESC;
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO airflow;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO airflow;
+
+-- =============================================================================
+-- Base de datos para MLflow (Extensión 3.6 — Fase 2)
+-- =============================================================================
+CREATE DATABASE mlflow_db;
+\connect mlflow_db;
+GRANT ALL PRIVILEGES ON DATABASE mlflow_db TO airflow;

@@ -440,7 +440,7 @@ Cada task importa la funcion `main()` del script correspondiente. Los scripts so
 
 - **Mejor manejo de errores**: Python exceptions vs exit codes de bash.
 - **Logging integrado**: print() se captura automaticamente en los logs de Airflow.
-- **Paso de contexto**: podemos usar XCom para pasar datos entre tasks (aunque en nuestro caso no lo necesitamos porque las tasks se comunican via archivos).
+- **Paso de contexto**: usamos XCom para compartir el CHURN_RUN_ID entre tasks, asegurando que las 3 tablas de PostgreSQL (processed_features, model_runs, model_predictions) comparten el mismo identificador de run.
 - **Testing**: podemos testear las funciones de Python directamente con pytest.
 
 ### 9.5 Por que LocalExecutor
@@ -479,11 +479,15 @@ Hereda de la imagen oficial de Airflow (que ya incluye el webserver, scheduler, 
 
 | Servicio | Imagen | Funcion | Puerto |
 |----------|--------|---------|--------|
-| postgres | postgres:13 | Base de datos de metadata de Airflow | 5432 (interno) |
+| postgres | postgres:13 | Base de datos de Airflow + churn_db + mlflow_db | 5432 (interno) |
+| mlflow-server | python:3.10-slim | MLflow Tracking Server | 5000 |
 | airflow-webserver | Custom (Dockerfile) | Interfaz web | 8080 |
 | airflow-scheduler | Custom (Dockerfile) | Ejecuta DAGs | - |
 | airflow-triggerer | Custom (Dockerfile) | Deferrable operators | - |
 | airflow-init | Custom (Dockerfile) | Inicializa DB + crea usuario admin | - |
+| pushgateway | prom/pushgateway | Recibe metricas push del pipeline | 9091 |
+| prometheus | prom/prometheus | Scrapea Pushgateway cada 15s, almacena series temporales | 9090 |
+| grafana | grafana/grafana | Dashboard "Churn Prediction Pipeline" (6 paneles) | 3000 |
 
 ### 10.4 Volumenes y por que son importantes
 
@@ -536,27 +540,61 @@ En ML, un estudio de ablacion consiste en eliminar componentes del modelo uno a 
 
 ---
 
-## 12. POSIBLES EXTENSIONES (BONUS)
+## 12. EXTENSIONES IMPLEMENTADAS Y POSIBLES
 
-### 12.1 MLflow
+### 12.1 PostgreSQL para persistencia de datos (IMPLEMENTADO)
 
-Plataforma de experiment tracking. Registra parametros, metricas, artefactos (modelos, graficos) de cada run. Permite comparar experimentos y versionar modelos con un Model Registry.
+Ademas de usarse como metadata store de Airflow, PostgreSQL aloja la base de datos **churn_db** con 3 tablas que se alimentan automaticamente en cada ejecucion del pipeline:
 
-Se integraria en train_model.py: `mlflow.log_param("max_depth", 6)`, `mlflow.log_metric("auc", 0.70)`, `mlflow.sklearn.log_model(model, "churn_model")`.
+- **processed_features**: Features procesadas por split (train/val/test) en formato JSONB. Sustituye a los CSVs como fuente de verdad persistente.
+- **model_runs**: Registro historico de cada ejecucion con metricas (AUC-ROC, F1, recall, precision, accuracy), confusion matrix, lift top percentiles, hiperparametros (JSONB), y metadata del modelo.
+- **model_predictions**: 15.000 predicciones por run con probabilidad de churn, prediccion binaria y valor real. Util para alimentar un CRM con scores de riesgo.
+- **latest_predictions**: Vista SQL que devuelve las predicciones del ultimo run ordenadas por probabilidad de churn.
 
-### 12.2 PostgreSQL para datos
+El modulo **db_utils.py** maneja la conexion y las inserciones con modo graceful: si PostgreSQL no esta disponible, el pipeline continua sin error usando solo archivos CSV. Para las columnas JSONB se usa psycopg2 con cast explicito (`%s::jsonb`) ya que pandas `to_sql` no soporta JSONB nativamente.
 
-En vez de guardar los datos procesados como CSV, se podrian persistir en PostgreSQL (ya lo tenemos corriendo para Airflow). Ventajas: queries SQL directos, control de acceso, transacciones ACID.
+El CHURN_RUN_ID se genera en `data_preparation` y se comparte a las demas tasks via **XCom**, garantizando consistencia entre las 3 tablas.
 
-### 12.3 Prometheus + Grafana
+### 12.2 MLflow Tracking Server (IMPLEMENTADO)
 
-Prometheus recoge metricas de aplicaciones. Grafana las visualiza en dashboards. Para nuestro caso, monitorizariamos:
-- AUC-ROC de cada reentrenamiento (detectar degradacion).
-- Distribucion de features de entrada (detectar data drift).
-- Tiempo de ejecucion del pipeline.
-- Alertas si AUC cae por debajo de un umbral.
+Servidor MLflow 2.12.2 desplegado como servicio Docker adicional en `docker-compose.yaml`, con backend store en PostgreSQL (mlflow_db) y artefactos en el volumen compartido `/models`.
 
-### 12.4 Feature Store
+Cada ejecucion del pipeline registra automaticamente 2 runs en el experimento **churn_prediction**:
+- **Run de entrenamiento**: 41 hiperparametros del XGBoost + 4 metricas de validacion (val_auc_roc, val_f1, val_recall, val_precision) + pickle del modelo como artefacto.
+- **Run de evaluacion**: metricas de test (AUC-ROC, F1, recall, precision, accuracy) + confusion matrix + curva de lift (8 percentiles) + reporte JSON como artefacto.
+
+La instrumentacion es graceful: si MLflow no esta disponible, los scripts continuan sin error. Accesible en http://localhost:5000.
+
+### 12.3 Prometheus + Grafana (IMPLEMENTADO)
+
+Stack de monitorizacion desplegado como 3 servicios Docker adicionales en `docker-compose.yaml`, integrado con el pipeline de evaluacion del modelo.
+
+**Arquitectura del flujo de metricas:**
+
+1. **metrics_exporter.py** — Modulo Python invocado al final de `evaluate_model`. Envia las metricas del run (AUC-ROC, F1, precision, recall, accuracy, confusion matrix, lift) al Pushgateway via HTTP POST.
+2. **Pushgateway (pushgateway:9091)** — Recibe y almacena las metricas push del pipeline. Necesario porque los jobs batch (como nuestro pipeline) no estan corriendo permanentemente para ser scrapeados directamente por Prometheus.
+3. **Prometheus (prometheus:9090)** — Scrapea el Pushgateway cada 15 segundos y almacena las metricas en su base de datos de series temporales. Configurado en `monitoring/prometheus/prometheus.yml`.
+4. **Grafana (grafana:3000)** — Visualiza las metricas en el dashboard **"Churn Prediction Pipeline"** con 6 paneles:
+   - **AUC-ROC Timeseries**: evolucion del AUC-ROC a lo largo de los runs.
+   - **F1 Timeseries**: evolucion del F1-Score a lo largo de los runs.
+   - **Current Metrics Stat**: panel de estadisticas con los valores actuales de AUC-ROC, F1, precision y recall.
+   - **Confusion Matrix**: visualizacion de TP, TN, FP, FN del ultimo run.
+   - **Lift Bargauge**: grafico de barras con el lift por percentil (top 5%, 10%, 20%, 30%, 50%).
+   - **Pipeline Data**: informacion general del pipeline (timestamp del ultimo run, numero de predicciones, etc.).
+
+**Servicios y puertos:**
+
+| Servicio | Puerto | URL |
+|----------|--------|-----|
+| Pushgateway | 9091 | http://localhost:9091 |
+| Prometheus | 9090 | http://localhost:9090 |
+| Grafana | 3000 | http://localhost:3000 |
+
+Grafana se accede con usuario `admin` / contraseña `admin`. El datasource de Prometheus y el dashboard se aprovisionan automaticamente via los ficheros en `monitoring/grafana/provisioning/`.
+
+La instrumentacion es graceful: si Pushgateway no esta disponible, `evaluate_model` continua sin error.
+
+### 12.4 Feature Store (PROPUESTO)
 
 Repositorio centralizado de features reutilizables. En vez de que cada modelo tenga su propio script de feature engineering, las features se calculan una vez y se comparten. Herramientas: Feast, Tecton, AWS Feature Store.
 
@@ -602,9 +640,13 @@ R: "Habria que cambiar varias cosas: usar Spark o Dask para el preprocesamiento 
 ## 14. CHECKLIST FINAL ANTES DE LA PRESENTACION
 
 - [ ] Ejecutar Docker localmente y verificar que el pipeline funciona end-to-end.
+- [ ] Verificar que MLflow muestra el experimento churn_prediction en http://localhost:5000.
+- [ ] Verificar que PostgreSQL tiene datos en churn_db: `docker compose exec postgres psql -U airflow -d churn_db -c "SELECT run_id, auc_roc FROM model_runs ORDER BY run_date DESC LIMIT 3;"`.
 - [ ] Tener los notebooks (01_EDA, 02_EDA_Profundo, 03_Modeling) abiertos por si piden ver codigo.
-- [ ] Repasar este documento, especialmente las secciones de metricas y SHAP.
+- [ ] Repasar este documento, especialmente las secciones de metricas, SHAP, y extensiones implementadas (seccion 12).
 - [ ] Preparar respuestas a las preguntas frecuentes de la seccion 13.
 - [ ] Ensayar la presentacion cronometrada (objetivo: 30 minutos sin prisas).
 - [ ] Tener abierta la UI de Airflow (localhost:8080) para hacer una demo en vivo si lo piden.
+- [ ] Verificar que Prometheus scrapea metricas del Pushgateway en http://localhost:9090/targets.
+- [ ] Verificar que Grafana muestra el dashboard "Churn Prediction Pipeline" con 6 paneles en http://localhost:3000.
 - [ ] Revisar que los numeros de la presentacion coinciden con los del notebook (AUC, F1, etc.).

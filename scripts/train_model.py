@@ -28,6 +28,7 @@ import os
 import pickle
 import sys
 import time
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -200,6 +201,61 @@ def save_model(model, artifacts, val_metrics, output_dir, X_train_shape):
 
 
 # =====================================================================
+# MLflow tracking (Extensión 3.6 — Fase 2)
+# =====================================================================
+def track_with_mlflow(model, val_metrics, X_train_shape, do_tuning, model_path):
+    """
+    Registra el experimento en MLflow Tracking Server.
+    Modo graceful: si MLflow no está disponible, simplemente se salta.
+    """
+    try:
+        import mlflow
+        import mlflow.xgboost
+
+        tracking_uri = os.environ.get('MLFLOW_TRACKING_URI', '')
+        if not tracking_uri:
+            print("[TRAIN] ℹ️  MLFLOW_TRACKING_URI no configurado. Saltando MLflow.")
+            return
+
+        mlflow.set_tracking_uri(tracking_uri)
+        mlflow.set_experiment("churn_prediction")
+
+        run_id_env = os.environ.get('CHURN_RUN_ID', '')
+
+        with mlflow.start_run(run_name=run_id_env or None):
+            # Log de hiperparámetros
+            params = model.get_params()
+            safe_params = {k: str(v) if v is not None else "None"
+                          for k, v in params.items()
+                          if k not in ('callbacks', 'missing')}
+            mlflow.log_params(safe_params)
+
+            # Log de metadata
+            mlflow.log_param("tuning_enabled", do_tuning)
+            mlflow.log_param("train_rows", X_train_shape[0])
+            mlflow.log_param("n_features", X_train_shape[1])
+
+            # Log de métricas de validation
+            for k, v in val_metrics.items():
+                mlflow.log_metric(k, v)
+
+            # Log del pickle como artefacto adicional
+            if os.path.exists(model_path):
+                try:
+                    mlflow.log_artifact(model_path, "pickle")
+                except Exception as e_art:
+                    print(f"[TRAIN] ⚠️  No se pudo loguear artefacto: {e_art}")
+
+            print(f"[TRAIN] ✅ Experimento registrado en MLflow (run: {mlflow.active_run().info.run_id[:8]}...)")
+
+    except ImportError:
+        print("[TRAIN] ℹ️  mlflow no instalado. Saltando tracking.")
+    except Exception as e:
+        print(f"[TRAIN] ⚠️  Error de MLflow (no crítico): {e}")
+        traceback.print_exc()
+
+
+# =====================================================================
 # Main
 # =====================================================================
 def main(data_dir: str, output_dir: str, do_tuning: bool = False, n_iter: int = 30):
@@ -219,8 +275,11 @@ def main(data_dir: str, output_dir: str, do_tuning: bool = False, n_iter: int = 
     # 3. Evaluación en validation
     val_metrics = evaluate_on_validation(model, X_val, y_val)
 
-    # 4. Guardar
-    save_model(model, artifacts, val_metrics, output_dir, X_train.shape)
+    # 4. Guardar pickle
+    model_path = save_model(model, artifacts, val_metrics, output_dir, X_train.shape)
+
+    # 5. [Extensión] Tracking con MLflow
+    track_with_mlflow(model, val_metrics, X_train.shape, do_tuning, model_path)
 
     print("\n[TRAIN] ✅ Entrenamiento completado exitosamente.")
     return 0

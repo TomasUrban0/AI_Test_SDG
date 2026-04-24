@@ -34,6 +34,7 @@ import json
 import os
 import pickle
 import sys
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -214,6 +215,64 @@ def persist_to_database(run_id, metrics, lift, y_proba, y_pred, y_test,
         print(f"[EVAL] ⚠️  Error de DB (no crítico): {e}")
 
 
+def track_test_metrics_mlflow(metrics, lift, model_path):
+    """
+    [Extensión 3.6 — Fase 2] Loguea métricas de test en MLflow.
+    Busca el run activo del experimento churn_prediction (creado por train_model)
+    y le añade las métricas de evaluación en test.
+    Modo graceful: si MLflow no está disponible, simplemente se salta.
+    """
+    try:
+        import mlflow
+
+        tracking_uri = os.environ.get('MLFLOW_TRACKING_URI', '')
+        if not tracking_uri:
+            print("[EVAL] ℹ️  MLFLOW_TRACKING_URI no configurado. Saltando MLflow.")
+            return
+
+        mlflow.set_tracking_uri(tracking_uri)
+        mlflow.set_experiment("churn_prediction")
+
+        run_id_env = os.environ.get('CHURN_RUN_ID', '')
+
+        with mlflow.start_run(run_name=f"{run_id_env}_eval" if run_id_env else None):
+            # Métricas principales de test
+            mlflow.log_metric("test_auc_roc", metrics['auc_roc'])
+            mlflow.log_metric("test_f1", metrics['f1'])
+            mlflow.log_metric("test_recall", metrics['recall'])
+            mlflow.log_metric("test_precision", metrics['precision'])
+            mlflow.log_metric("test_accuracy", metrics['accuracy'])
+
+            # Confusion matrix
+            cm = metrics.get('confusion_matrix', {})
+            mlflow.log_metric("test_true_negatives", cm.get('TN', 0))
+            mlflow.log_metric("test_false_positives", cm.get('FP', 0))
+            mlflow.log_metric("test_false_negatives", cm.get('FN', 0))
+            mlflow.log_metric("test_true_positives", cm.get('TP', 0))
+
+            # Lift top percentiles
+            for key, data in lift.items():
+                pct = key.replace('top_', '').replace('pct', '')
+                mlflow.log_metric(f"lift_top_{pct}pct", data['lift'])
+                mlflow.log_metric(f"gain_top_{pct}pct", data['cumulative_gain'])
+
+            # Log evaluation report JSON como artefacto
+            report_path = os.path.join(os.path.dirname(model_path), 'evaluation_report.json')
+            if os.path.exists(report_path):
+                try:
+                    mlflow.log_artifact(report_path, "evaluation")
+                except Exception as e_art:
+                    print(f"[EVAL] ⚠️  No se pudo loguear artefacto: {e_art}")
+
+            print(f"[EVAL] ✅ Métricas de test registradas en MLflow (run: {mlflow.active_run().info.run_id[:8]}...)")
+
+    except ImportError:
+        print("[EVAL] ℹ️  mlflow no instalado. Saltando tracking.")
+    except Exception as e:
+        print(f"[EVAL] ⚠️  Error de MLflow (no crítico): {e}")
+        traceback.print_exc()
+
+
 def main(model_path: str, data_dir: str, save_json: bool = True):
     print("=" * 70)
     print(" PASO 3 — EVALUACIÓN DEL MODELO")
@@ -264,7 +323,25 @@ def main(model_path: str, data_dir: str, save_json: bool = True):
         model_path=model_path,
     )
 
-    # 8. Verificar que el modelo es mínimamente funcional
+    # 8. [Extensión] Loguear métricas de test en MLflow
+    track_test_metrics_mlflow(metrics, lift, model_path)
+
+    # 9. [Extensión] Exportar métricas a Prometheus Pushgateway
+    try:
+        from metrics_exporter import push_metrics_to_prometheus
+        push_metrics_to_prometheus(
+            metrics=metrics,
+            lift=lift,
+            run_id=run_id,
+            n_samples=X_test.shape[0],
+            churn_rate=float(y_test.mean()),
+        )
+    except ImportError:
+        print("[EVAL] ℹ️  metrics_exporter no disponible. Saltando Prometheus.")
+    except Exception as e:
+        print(f"[EVAL] ⚠️  Error de Prometheus (no crítico): {e}")
+
+    # 10. Verificar que el modelo es mínimamente funcional
     if metrics['auc_roc'] < 0.55:
         print("\n[EVAL] ⚠️  ALERTA: AUC-ROC < 0.55 — el modelo apenas supera el azar.")
         print("[EVAL] Revisar el preprocesamiento y el entrenamiento.")

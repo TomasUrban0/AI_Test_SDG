@@ -36,18 +36,32 @@ docker compose version    # Debe mostrar v2.x
 AI_Test_SDG/
 ├── airflow/                      ← TÚ ESTÁS AQUÍ
 │   ├── docker-compose.yaml       ← Configuración de los contenedores
-│   ├── Dockerfile                ← Imagen custom con xgboost, sklearn, etc.
+│   ├── Dockerfile                ← Imagen custom con xgboost, sklearn, mlflow, etc.
 │   ├── requirements.txt          ← Dependencias Python para la imagen
 │   ├── .env                      ← AIRFLOW_UID (ajustar en Linux)
+│   ├── init-db/
+│   │   └── 01_create_churn_db.sql ← Schema de churn_db y mlflow_db (auto-init)
 │   ├── dags/
 │   │   └── churn_pipeline_dag.py ← El DAG que orquesta el pipeline
 │   ├── logs/                     ← Logs de ejecución (auto-generado)
 │   ├── plugins/                  ← Plugins de Airflow (vacío)
 │   └── config/                   ← Config adicional (vacío)
-├── scripts/                      ← Los 3 scripts modulares (montados en Docker)
+├── monitoring/                   ← Stack de monitorización
+│   ├── prometheus/
+│   │   └── prometheus.yml        ← Configuración de scraping (Pushgateway cada 15s)
+│   └── grafana/
+│       └── provisioning/
+│           ├── datasources/
+│           │   └── datasource.yml ← Datasource Prometheus (auto-provisioned)
+│           └── dashboards/
+│               ├── dashboard.yml  ← Proveedor de dashboards
+│               └── churn_pipeline.json ← Dashboard "Churn Prediction Pipeline" (6 paneles)
+├── scripts/                      ← Los 5 scripts modulares (montados en Docker)
 │   ├── data_preparation.py
 │   ├── train_model.py
-│   └── evaluate_model.py
+│   ├── evaluate_model.py
+│   ├── db_utils.py               ← Utilidades de conexión a PostgreSQL
+│   └── metrics_exporter.py       ← Envía métricas al Pushgateway
 ├── data/                         ← Datos (montados en Docker)
 │   ├── dataset.csv               ← Dataset original
 │   └── processed/                ← Generado por el pipeline
@@ -98,18 +112,23 @@ Espera ~30 segundos y verifica que todo esté corriendo:
 docker compose ps
 ```
 
-Deberías ver 4 contenedores con estado "healthy":
-- `postgres`
-- `airflow-webserver`
-- `airflow-scheduler`
-- `airflow-triggerer`
+Deberías ver 8 contenedores con estado "healthy" o "running":
+- `postgres` — Base de datos de Airflow + churn_db + mlflow_db
+- `mlflow-server` — MLflow Tracking Server (http://localhost:5000)
+- `airflow-webserver` — Interfaz web de Airflow (http://localhost:8080)
+- `airflow-scheduler` — Ejecuta los DAGs
+- `airflow-triggerer` — Deferrable operators
+- `pushgateway` — Recibe métricas push del pipeline (http://localhost:9091)
+- `prometheus` — Scrapea Pushgateway cada 15s y almacena series temporales (http://localhost:9090)
+- `grafana` — Dashboard "Churn Prediction Pipeline" con 6 paneles (http://localhost:3000)
 
-### Paso 4: Acceder a la interfaz web
+### Paso 4: Acceder a las interfaces web
 
-Abre en tu navegador: **http://localhost:8080**
-
-- **Usuario:** `airflow`
-- **Contraseña:** `airflow`
+- **Airflow:** http://localhost:8080 (usuario: `airflow` / contraseña: `airflow`)
+- **MLflow:** http://localhost:5000 (sin autenticación)
+- **Grafana:** http://localhost:3000 (usuario: `admin` / contraseña: `admin`)
+- **Prometheus:** http://localhost:9090 (sin autenticación)
+- **Pushgateway:** http://localhost:9091 (sin autenticación)
 
 ### Paso 5: Ejecutar el pipeline
 
@@ -132,6 +151,29 @@ Después de la ejecución exitosa:
 - **Modelo**: `models/churn_model.pkl` (actualizado).
 - **Reporte JSON**: `models/evaluation_report.json`.
 - **Datos procesados**: `data/processed/` (X_train, X_test, etc.).
+- **PostgreSQL (churn_db)**: Métricas, predicciones y features persistidas en 3 tablas:
+  - `model_runs` — registro histórico de cada run con métricas y hiperparámetros.
+  - `model_predictions` — 15K predicciones por run (probabilidad + predicción + valor real).
+  - `processed_features` — features procesadas por split (train/val/test).
+- **MLflow**: Experimento `churn_prediction` en http://localhost:5000 con:
+  - Run de entrenamiento: 41 hiperparámetros + 4 métricas de validación.
+  - Run de evaluación: métricas de test (AUC, F1, recall, precision, accuracy) + confusion matrix + lift.
+
+### Consultar datos en PostgreSQL
+
+```bash
+# Conectar a churn_db desde el contenedor de postgres
+docker compose exec postgres psql -U airflow -d churn_db
+
+# Ver métricas del último run
+SELECT run_id, auc_roc, f1_score, recall, precision_val FROM model_runs ORDER BY run_date DESC LIMIT 5;
+
+# Ver predicciones de mayor riesgo
+SELECT * FROM latest_predictions LIMIT 10;
+
+# Contar registros
+SELECT count(*) FROM model_predictions;
+```
 
 ---
 

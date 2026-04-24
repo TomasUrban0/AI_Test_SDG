@@ -1,7 +1,7 @@
 # Guion de Presentacion — Churn Prediction SDG Group
 
 **Duracion estimada: 30-35 minutos**
-**25 diapositivas | ~1.5 min por diapositiva de contenido, ~30s por diapositiva de seccion**
+**27 diapositivas | ~1.5 min por diapositiva de contenido, ~30s por diapositiva de seccion**
 
 ---
 
@@ -343,11 +343,13 @@
 
 ## Diapositiva 22 — Infraestructura: Docker Compose (1.5 minutos)
 
-**Lo que se ve:** 4 servicios de Docker, panel de decisiones de diseño, comandos.
+**Lo que se ve:** 10 servicios de Docker, panel de decisiones de diseño, comandos.
 
 **Que decir:**
 
-> "Todo corre sobre Docker Compose con 4 servicios: PostgreSQL como base de datos de metadata de Airflow, el Webserver para la interfaz grafica en el puerto 8080, el Scheduler que ejecuta los DAGs, y el Triggerer para operadores diferibles.
+> "Todo corre sobre Docker Compose con 10 servicios: PostgreSQL como base de datos de metadata de Airflow y tambien como store de churn_db (metricas, predicciones, features) y mlflow_db, el servidor MLflow para experiment tracking en el puerto 5000, el Webserver para la interfaz grafica en el puerto 8080, el Scheduler que ejecuta los DAGs, el Triggerer para operadores diferibles, airflow-init para la inicializacion, y el stack completo de monitorizacion con **Pushgateway** en el puerto 9091, **Prometheus** en el puerto 9090 y **Grafana** en el puerto 3000.
+>
+> El stack de monitorizacion funciona asi: al final de cada evaluate_model, el modulo metrics_exporter.py envia las metricas del run al Pushgateway. Prometheus scrapea el Pushgateway cada 15 segundos. Y Grafana visualiza todo en un dashboard llamado 'Churn Prediction Pipeline' con 6 paneles: timeseries de AUC-ROC y F1, estadisticas actuales, confusion matrix, lift por percentil, y datos del pipeline.
 >
 > Decisiones de diseño importantes: elegimos **LocalExecutor** en vez de CeleryExecutor porque para un solo DAG secuencial no necesitamos la complejidad de Celery + Redis. Esto reduce el consumo de RAM de 8GB a unos 4GB.
 >
@@ -355,17 +357,43 @@
 >
 > Los **volumenes** montan las carpetas scripts/, data/ y models/ directamente en el contenedor. Esto significa que los cambios en los scripts se reflejan inmediatamente sin reconstruir la imagen.
 >
-> Para ejecutar todo, son literalmente 3 comandos: build, init, up. Y la interfaz queda disponible en localhost:8080 con user/pass airflow/airflow."
+> Para ejecutar todo, son literalmente 3 comandos: build, init, up. Y las interfaces quedan disponibles en localhost:8080 (Airflow), localhost:5000 (MLflow), y localhost:3000 (Grafana)."
 
 ---
 
-## Diapositiva 23 — Seccion: Conclusiones (15 segundos)
+## Diapositiva 23 — Evidencia: Orquestacion y Experiment Tracking (1.5 minutos)
+
+**Lo que se ve:** Capturas de pantalla reales de Airflow (DAG con 10 runs verdes) y MLflow (run completado con metricas).
+
+**Que decir:**
+
+> "Esto es evidencia real de la infraestructura funcionando. A la izquierda veis Apache Airflow con el DAG churn_prediction_pipeline: 10 ejecuciones exitosas, cada una con 3 tasks verdes. El ultimo run tardo 1 minuto y 21 segundos de principio a fin.
+>
+> A la derecha, MLflow 2.12.2 mostrando el detalle de un run completado. Podeis ver los 41 hiperparametros del modelo registrados automaticamente, y las 4 metricas de validacion: val_auc_roc de 0.6913, val_f1 de 0.6376, val_recall de 0.6434 y val_precision de 0.6319. Todo queda versionado para comparacion entre runs."
+
+---
+
+## Diapositiva 24 — Evidencia: Monitoreo con Prometheus y Grafana (1.5 minutos)
+
+**Lo que se ve:** Captura grande del dashboard de Grafana con metricas reales + captura de Prometheus con la query churn_test_auc_roc.
+
+**Que decir:**
+
+> "Y esta es la pieza final del stack de monitorizacion. El dashboard de Grafana 'Churn Prediction Pipeline' tiene 6 paneles: arriba las timeseries de AUC-ROC y F1 Score, debajo las metricas actuales del modelo — 69.9% AUC-ROC, 64% F1 — la confusion matrix con los 4.77K true positives y 4.86K true negatives, el lift por percentil mostrando 1.67x en el top 5%, y los datos del pipeline como las 15K muestras de test.
+>
+> A la derecha, Prometheus confirmando que tiene los datos: la query churn_test_auc_roc devuelve el valor 0.6986 para los dos runs del job churn_pipeline.
+>
+> El flujo completo es: evaluate_model ejecuta metrics_exporter.py que hace un HTTP PUT al Pushgateway en el puerto 9091. Prometheus scrapea el Pushgateway cada 15 segundos. Y Grafana consulta a Prometheus para renderizar los paneles. Todo automatico, sin intervencion manual."
+
+---
+
+## Diapositiva 25 — Seccion: Conclusiones (15 segundos)
 
 > "Para cerrar, un resumen de lo construido y los siguientes pasos."
 
 ---
 
-## Diapositiva 24 — Resumen y Siguientes Pasos (2 minutos)
+## Diapositiva 26 — Resumen y Siguientes Pasos (2 minutos)
 
 **Lo que se ve:** Checklist de lo construido (izquierda) + lista de siguientes pasos (derecha).
 
@@ -373,21 +401,25 @@
 
 > "Resumiendo lo que hemos construido: un EDA profundo con deteccion de mas de 13 trampas, 8 features nuevas con logica de negocio, un XGBoost tuneado con AUC de ~0.70 y lift de 1.59x, interpretabilidad con SHAP, un estudio de ablacion para validar que no hay leakage, 3 scripts modulares y testeados end-to-end, y un DAG de Airflow con Docker listo para desplegar.
 >
-> Para **siguientes pasos**, hay varias extensiones que aportarian valor:
+> Pero ademas del pipeline base, he implementado tres extensiones que demuestran capacidad MLOps:
 >
-> **MLflow** para experiment tracking: versionar modelos, comparar runs, registrar artefactos con trazabilidad completa.
+> **PostgreSQL** como capa de persistencia: las metricas, predicciones y features procesadas se guardan automaticamente en 3 tablas de la base de datos churn_db. Esto permite consultas SQL directas, historial de runs para detectar degradacion, y alimentar un CRM con scores de riesgo de churn. El run_id se comparte entre las 3 tasks del DAG via XCom para garantizar consistencia.
 >
-> **PostgreSQL** para persistir los datos procesados en vez de CSVs, lo cual es mas robusto y permite queries SQL.
+> **MLflow** como plataforma de experiment tracking: cada ejecucion del pipeline registra automaticamente los hiperparametros del modelo, las metricas de validacion y test, la confusion matrix, la curva de lift, y el modelo serializado. La UI de MLflow permite comparar runs y detectar regresiones.
 >
-> **Prometheus + Grafana** para monitorizar el drift del modelo en produccion: si la distribucion de los datos cambia, las predicciones se degradan y hay que reentrenar.
+> **Prometheus + Grafana** como stack de monitorizacion: al final de cada evaluate_model, las metricas se envian automaticamente al Pushgateway via metrics_exporter.py. Prometheus las scrapea cada 15 segundos y Grafana las visualiza en un dashboard 'Churn Prediction Pipeline' con 6 paneles: timeseries de AUC-ROC y F1, estadisticas actuales, confusion matrix, lift por percentil y datos del pipeline. Accesible en localhost:3000.
+>
+> Para **siguientes pasos**, las extensiones que aportarian mas valor serian:
 >
 > **Feature store** para centralizar features reutilizables entre equipos y modelos.
+>
+> **Alertas automaticas en Grafana** para notificar via Slack o email cuando el AUC-ROC cae por debajo de un umbral configurable.
 >
 > Y cuando trabajemos con **datos reales desbalanceados** (churn del 2%), tendremos que adaptar con class_weight o SMOTE y recalibrar los thresholds."
 
 ---
 
-## Diapositiva 25 — Gracias / Q&A (abierto)
+## Diapositiva 27 — Gracias / Q&A (abierto)
 
 **Lo que se ve:** "Gracias", "Preguntas y Respuestas", contacto.
 
@@ -406,7 +438,7 @@
 ### Sobre el modelo
 - **"¿Por que no deep learning?"** → Para datos tabulares de este tamaño, los gradient boosting trees son state-of-the-art segun benchmarks recientes (Grinsztajn et al., 2022). Ademas, SHAP TreeExplainer es exacto, mientras que SHAP en redes neuronales es aproximado.
 - **"¿El AUC de 0.70 es suficiente?"** → Depende del contexto. Para un dataset con 100 features ruidosas y trampas, es solido. En produccion, con feature engineering adicional, datos temporales, y variables de contrato, podria mejorar a 0.75-0.80.
-- **"¿Que pasa si el modelo se degrada con el tiempo?"** → Model drift. Por eso es importante monitorizar metricas en produccion y reentrenar periodicamente (propuesta de Prometheus + Grafana).
+- **"¿Que pasa si el modelo se degrada con el tiempo?"** → Model drift. Ya tenemos la infraestructura completa para detectarlo: cada run del pipeline guarda las metricas en PostgreSQL (tabla model_runs) y en MLflow, y ademas las envia a Prometheus via Pushgateway. El dashboard de Grafana "Churn Prediction Pipeline" muestra la evolucion temporal del AUC-ROC y F1, permitiendo detectar degradacion visualmente. El siguiente paso seria configurar alertas automaticas en Grafana para notificar cuando el AUC caiga por debajo de un umbral.
 
 ### Sobre la arquitectura
 - **"¿Por que Airflow y no Luigi/Prefect/Dagster?"** → Airflow es el estandar de la industria, tiene la mayor comunidad, integracion nativa con la mayoria de clouds, y es lo que pide la prueba tecnica.

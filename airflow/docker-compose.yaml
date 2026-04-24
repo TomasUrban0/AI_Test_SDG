@@ -40,6 +40,10 @@ x-airflow-common:
     CHURN_DB_NAME: churn_db
     CHURN_DB_USER: airflow
     CHURN_DB_PASSWORD: airflow
+    # Extensión 3.6 — Fase 2: MLflow tracking
+    MLFLOW_TRACKING_URI: http://mlflow-server:5000
+    # Extensión 3.6 — Fase 3: Prometheus Pushgateway
+    PUSHGATEWAY_URL: http://pushgateway:9091
     _PIP_ADDITIONAL_REQUIREMENTS: ''
   volumes:
     - ./dags:/opt/airflow/dags
@@ -65,7 +69,7 @@ services:
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
       # Extensión 3.6: permite crear múltiples DBs
-      POSTGRES_MULTIPLE_DATABASES: churn_db
+      POSTGRES_MULTIPLE_DATABASES: churn_db,mlflow_db
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d    # Script de init para churn_db
@@ -74,6 +78,62 @@ services:
       interval: 10s
       retries: 5
       start_period: 5s
+    restart: always
+
+  # =========================================================================
+  # MLflow Tracking Server — experiment tracking (http://localhost:5000)
+  # =========================================================================
+  mlflow-server:
+    image: python:3.10-slim
+    command: bash -c "pip install --no-cache-dir mlflow==2.12.2 psycopg2-binary && mlflow server --backend-store-uri postgresql+psycopg2://airflow:airflow@postgres:5432/mlflow_db --default-artifact-root /mlflow/artifacts --host 0.0.0.0 --port 5000"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../models:/mlflow/artifacts    # Artefactos compartidos con el pipeline
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+
+  # =========================================================================
+  # Prometheus Pushgateway — recibe métricas del pipeline (http://localhost:9091)
+  # =========================================================================
+  pushgateway:
+    image: prom/pushgateway:v1.6.2
+    ports:
+      - "9091:9091"
+    restart: always
+
+  # =========================================================================
+  # Prometheus — almacena y consulta métricas (http://localhost:9090)
+  # =========================================================================
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - pushgateway
+    restart: always
+
+  # =========================================================================
+  # Grafana — dashboards de monitorización (http://localhost:3000)
+  # =========================================================================
+  grafana:
+    image: grafana/grafana:10.2.3
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
     restart: always
 
   # =========================================================================
