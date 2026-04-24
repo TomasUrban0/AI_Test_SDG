@@ -136,3 +136,12 @@ Incluye un gate de calidad: si AUC < 0.55, retorna error.
 Pipeline verificado end-to-end:
 data_preparation.py  →  train_model.py  →  evaluate_model.py
        (16s)                (4.5s)              (1s)
+
+---
+
+Modificaciones presentacion:
+ Quizas pondria una imagen de fondo en la diapos 2 y una imagen de fondo a la derecha en la 1
+ En la 12 el textro sobresale por debajo del recuadro de la izquierda
+ En la 13  el textro sobresale por debajo del recuadro de la derecha
+ En la 17  el textro sobresale por debajo del recuadro de la derecha
+ En la 22 el recuadro del MLflow sobresale por la derecha de la diapositiva
