@@ -11,7 +11,7 @@
 
 **Que decir:**
 
-> "Buenos dias/tardes. Soy Tomas Montero y voy a presentar mi solucion a la prueba tecnica de prediccion de churn en telecomunicaciones. A lo largo de esta presentacion voy a recorrer todo el ciclo de vida del proyecto: desde la exploracion inicial de los datos, pasando por la deteccion de trampas en el dataset, la construccion y evaluacion del modelo predictivo, hasta la arquitectura de produccion con Airflow y Docker."
+> "Buenos dias/tardes. Soy Miguel Ángel Montero y voy a presentar mi solucion a la prueba tecnica de prediccion de churn en telecomunicaciones. Voy a recorrer todo el ciclo de vida del proyecto: desde la exploracion inicial de los datos, pasando por la deteccion de peculiaridades en el dataset, la construccion y evaluacion del modelo predictivo, hasta la arquitectura de produccion con Airflow y Docker."
 
 ---
 
@@ -21,7 +21,7 @@
 
 **Que decir:**
 
-> "He estructurado la presentacion en seis bloques. Primero vamos a entender el problema de negocio y por que es importante. Despues entraremos en el analisis exploratorio, donde veremos que el dataset tenia varias trampas intencionadas que habia que detectar. Luego pasamos al modelo predictivo: por que elegimos XGBoost, como lo tuneamos y que resultados obtuvimos. Despues traduciremos esos resultados a valor de negocio con la curva de lift y recomendaciones accionables. Veremos la arquitectura del pipeline con Airflow y Docker. Y finalmente, conclusiones y siguientes pasos."
+> "He estructurado la presentacion en seis bloques. Primero vamos a entender el problema de negocio y por que es importante. Despues entraremos en el analisis exploratorio, donde veremos que el dataset tenia varias peculiaridades intencionadas que habia que detectar. Luego pasamos al modelo predictivo: por que elegimos XGBoost, como lo tuneamos y que resultados obtuvimos. Despues traduciremos esos resultados a valor de negocio con la curva de lift y recomendaciones accionables. Veremos la arquitectura del pipeline con Airflow y Docker. Y finalmente, conclusiones y siguientes pasos."
 
 ---
 
@@ -64,7 +64,7 @@
 
 **Que decir:**
 
-> "El EDA revelo que el dataset contenia varias trampas intencionadas. Vamos una por una.
+> "El EDA revelo que el dataset contenia varias peculiaridades intencionadas. Vamos una por una.
 >
 > **Balance artificial 50/50**: como ya mencione, tener exactamente 50% churn es poco realista. Esto nos dice que el dataset fue construido para propositos de testing. La ventaja es que no necesitamos tecnicas de oversampling como SMOTE, pero debemos recordar que en produccion las proporciones seran muy diferentes.
 >
@@ -80,13 +80,13 @@
 
 ---
 
-## Diapositiva 7 — Trampas Detectadas en el Dataset (2 minutos)
+## Diapositiva 7 — Peculiaridades Detectadas en el Dataset (2 minutos)
 
 **Lo que se ve:** 5 filas con badges de severidad (CRITICA, MEDIA, VALIDADA, ALTA).
 
 **Que decir:**
 
-> "Ademas de los hallazgos del EDA basico, detectamos trampas adicionales.
+> "Ademas de los hallazgos del EDA basico, detectamos peculiaridades adicionales.
 >
 > La mas **critica**: Customer_ID esta ordenado y correlacionado con churn. Si no lo eliminamos, el modelo aprenderia el orden de los IDs en vez de patrones reales. Esto seria data leakage puro.
 >
@@ -94,7 +94,7 @@
 >
 > **Dummies sin señal**: variables binarias donde la tasa de churn es identica para 0 y para 1. Es decir, no tienen correlacion alguna con el target.
 >
-> Un caso interesante: **change_mou**, que es el cambio en minutos de uso. Es el predictor numero 1 segun SHAP, pero nos preguntamos si podria ser leakage: si representa el cambio DESPUES de que el cliente decide irse, seria trampa. Hicimos un estudio de ablacion que veremos mas adelante, y confirmamos que NO es leakage.
+> Un caso interesante: **change_mou**, que es el cambio en minutos de uso. Es el predictor numero 1 segun SHAP, pero nos preguntamos si podria ser leakage: si representa el cambio DESPUES de que el cliente decide irse, seria data leakage. Hicimos un estudio de ablacion que veremos mas adelante, y confirmamos que NO es leakage.
 >
 > Y finalmente, eliminamos todas las columnas con mas del 85% de nulos. Imputar mas del 85% seria basicamente inventar datos."
 
@@ -143,7 +143,7 @@
 
 > "Antes de entrenar, el preprocesamiento sigue estos 5 pasos en orden.
 >
-> Primero, la limpieza de todas las trampas que vimos. Despues, el feature engineering con las 8 variables nuevas. Luego, LabelEncoder para convertir las categoricas a numerico — elegimos LabelEncoder sobre OneHotEncoder porque con arboles de decision (XGBoost) funciona igual de bien y evita la explosion de dimensionalidad.
+> Primero, la limpieza de todas las peculiaridades que vimos. Despues, el feature engineering con las 8 variables nuevas. Luego, LabelEncoder para convertir las categoricas a numerico — elegimos LabelEncoder sobre OneHotEncoder porque con arboles de decision (XGBoost) funciona igual de bien y evita la explosion de dimensionalidad.
 >
 > La imputacion de nulos numericos se hace con la mediana, que es robusta a outliers. Y finalmente, un split estratificado 70/15/15: train, validation y test. El validation set se usa durante el entrenamiento para early stopping y sanity check, y el test set se reserva exclusivamente para la evaluacion final.
 >
@@ -204,7 +204,7 @@
 
 > "Estos son los resultados finales sobre el test set, que el modelo nunca vio durante el entrenamiento.
 >
-> **AUC-ROC de 0.6986**: esto indica una capacidad discriminativa moderada-buena. Puede parecer modesto, pero hay que tener en cuenta que estamos trabajando con un dataset de 100 columnas llenas de trampas y ruido. Un AUC de ~0.70 sobre datos limpios y con features interpretables es un resultado solido.
+> **AUC-ROC de 0.6986**: esto indica una capacidad discriminativa moderada-buena. Puede parecer modesto, pero hay que tener en cuenta que estamos trabajando con un dataset de 100 columnas llenas de peculiaridades y ruido. Un AUC de ~0.70 sobre datos limpios y con features interpretables es un resultado solido.
 >
 > **F1 Score de 0.6399**: equilibra precision y recall. En nuestro caso, ambas estan bastante parejas, lo cual es bueno.
 >
@@ -289,7 +289,7 @@
 
 > "Este es un punto que quiero destacar porque demuestra rigor analitico. change_mou es el predictor numero 1, pero nos planteamos una pregunta critica: ¿podria ser leakage?
 >
-> El argumento seria: si change_mou representa el cambio en uso DESPUES de que el cliente ya decidio irse, entonces estariamos haciendo trampa. El modelo estaria usando informacion del futuro para predecir algo que ya paso.
+> El argumento seria: si change_mou representa el cambio en uso DESPUES de que el cliente ya decidio irse, entonces estariamos incurriendo en data leakage. El modelo estaria usando informacion del futuro para predecir algo que ya paso.
 >
 > Para verificarlo, hicimos un estudio de ablacion: entrenamos el modelo completo quitando change_mou y comparamos las metricas. El AUC cayo de 0.6986 a aproximadamente 0.67, un delta de solo ~3 puntos porcentuales. El F1 cayo similarmente unos 2 puntos.
 >
@@ -331,7 +331,7 @@
 
 > "El pipeline esta orquestado con Apache Airflow en un DAG de exactamente 3 tasks, como pide la prueba.
 >
-> **Task 1: data_preparation**, que tarda unos 16 segundos. Carga el dataset original, ejecuta toda la limpieza de trampas, el feature engineering, el encoding y el split. Guarda los datasets procesados como CSV y los artefactos de preprocesamiento como pickle.
+> **Task 1: data_preparation**, que tarda unos 16 segundos. Carga el dataset original, ejecuta toda la limpieza de peculiaridades, el feature engineering, el encoding y el split. Guarda los datasets procesados como CSV y los artefactos de preprocesamiento como pickle.
 >
 > **Task 2: train_model**, unos 5 segundos. Carga los datos procesados, entrena el XGBoost con los hiperparametros optimizados, hace un sanity check en el validation set, y guarda el modelo completo como pickle. El pickle incluye no solo el modelo sino tambien los artefactos de preprocesamiento (encoders, imputer, scaler) para que sea auto-contenido.
 >
@@ -399,7 +399,7 @@
 
 **Que decir:**
 
-> "Resumiendo lo que hemos construido: un EDA profundo con deteccion de mas de 13 trampas, 8 features nuevas con logica de negocio, un XGBoost tuneado con AUC de ~0.70 y lift de 1.59x, interpretabilidad con SHAP, un estudio de ablacion para validar que no hay leakage, 3 scripts modulares y testeados end-to-end, y un DAG de Airflow con Docker listo para desplegar.
+> "Resumiendo lo que hemos construido: un EDA profundo con deteccion de mas de 13 peculiaridades, 8 features nuevas con logica de negocio, un XGBoost tuneado con AUC de ~0.70 y lift de 1.59x, interpretabilidad con SHAP, un estudio de ablacion para validar que no hay leakage, 3 scripts modulares y testeados end-to-end, y un DAG de Airflow con Docker listo para desplegar.
 >
 > Pero ademas del pipeline base, he implementado tres extensiones que demuestran capacidad MLOps:
 >
@@ -437,7 +437,7 @@
 
 ### Sobre el modelo
 - **"¿Por que no deep learning?"** → Para datos tabulares de este tamaño, los gradient boosting trees son state-of-the-art segun benchmarks recientes (Grinsztajn et al., 2022). Ademas, SHAP TreeExplainer es exacto, mientras que SHAP en redes neuronales es aproximado.
-- **"¿El AUC de 0.70 es suficiente?"** → Depende del contexto. Para un dataset con 100 features ruidosas y trampas, es solido. En produccion, con feature engineering adicional, datos temporales, y variables de contrato, podria mejorar a 0.75-0.80.
+- **"¿El AUC de 0.70 es suficiente?"** → Depende del contexto. Para un dataset con 100 features ruidosas y peculiaridades, es solido. En produccion, con feature engineering adicional, datos temporales, y variables de contrato, podria mejorar a 0.75-0.80.
 - **"¿Que pasa si el modelo se degrada con el tiempo?"** → Model drift. Ya tenemos la infraestructura completa para detectarlo: cada run del pipeline guarda las metricas en PostgreSQL (tabla model_runs) y en MLflow, y ademas las envia a Prometheus via Pushgateway. El dashboard de Grafana "Churn Prediction Pipeline" muestra la evolucion temporal del AUC-ROC y F1, permitiendo detectar degradacion visualmente. El siguiente paso seria configurar alertas automaticas en Grafana para notificar cuando el AUC caiga por debajo de un umbral.
 
 ### Sobre la arquitectura

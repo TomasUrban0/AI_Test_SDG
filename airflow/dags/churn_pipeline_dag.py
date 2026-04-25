@@ -67,7 +67,7 @@ def run_data_preparation(**context):
     """
     TASK 1: Preparación de datos.
 
-    Carga dataset.csv, aplica limpieza de trampas (nulos camuflados,
+    Carga dataset.csv, aplica limpieza de peculiaridades (nulos camuflados,
     valores negativos, multicolinealidad, varianza nula), crea features
     nuevas, codifica categóricas, imputa nulos, hace split estratificado
     70/15/15, y guarda los datasets procesados.

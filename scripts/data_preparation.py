@@ -5,7 +5,7 @@
 
  Qué hace este script:
    1. Carga el dataset original (dataset.csv).
-   2. Limpia las trampas detectadas en el EDA:
+   2. Limpia las peculiaridades detectadas en el EDA:
       - Reemplaza nulos camuflados ("U", "Z") por NaN.
       - Elimina columnas con >85% de nulos.
       - Corrige valores negativos en eqpdays.
@@ -309,7 +309,7 @@ def main(input_path: str, output_dir: str):
     # 1. Carga
     df = load_data(input_path)
 
-    # 2. Limpieza de trampas
+    # 2. Limpieza de peculiaridades
     df = clean_hidden_nulls(df)
     df = drop_high_null_cols(df)
     df = fix_negative_eqpdays(df)

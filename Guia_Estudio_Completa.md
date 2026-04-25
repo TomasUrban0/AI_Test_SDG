@@ -52,11 +52,11 @@ El EDA no es un paso formal que se hace "porque toca". Es la fase donde se entie
 - **Mann-Whitney U** para numericas vs target (no asume normalidad).
 - **Correlacion de Spearman** como alternativa robusta a Pearson.
 
-### 2.3 Las trampas de nuestro dataset
+### 2.3 Las peculiaridades de nuestro dataset
 
-Nuestro dataset de 100K x 100 tenia las siguientes trampas intencionadas:
+Nuestro dataset de 100K x 100 tenia las siguientes peculiaridades intencionadas:
 
-| Trampa | Tipo | Severidad | Solucion |
+| Peculiaridad | Tipo | Severidad | Solucion |
 |--------|------|-----------|----------|
 | Customer_ID ordenado y correlacionado con churn | Data leakage | CRITICA | Eliminar del modelo |
 | Balance artificial 50/50 | Diseño experimental | MEDIA | Tener en cuenta al interpretar accuracy |
@@ -616,10 +616,10 @@ R: "LabelEncoder asignaria un error. En produccion, habria que manejar categoria
 ### Sobre el modelo
 
 **P: "¿El AUC de 0.70 es bueno o malo?"**
-R: "Depende del contexto. Para un dataset artificial con 100 features ruidosas y trampas, es un resultado solido. En la industria, modelos de churn con datos reales suelen estar entre 0.75-0.85. Con feature engineering adicional, datos temporales, y variables de contrato (que aqui no tenemos), podriamos mejorar."
+R: "Depende del contexto. Para un dataset artificial con 100 features ruidosas y peculiaridades, es un resultado solido. En la industria, modelos de churn con datos reales suelen estar entre 0.75-0.85. Con feature engineering adicional, datos temporales, y variables de contrato (que aqui no tenemos), podriamos mejorar."
 
 **P: "¿Que harias para mejorar el AUC?"**
-R: "Varias cosas: mas feature engineering (interacciones, lag features), datos temporales (tendencias de uso mes a mes), stacking de modelos, y sobre todo datos de mejor calidad (sin las trampas artificiales)."
+R: "Varias cosas: mas feature engineering (interacciones, lag features), datos temporales (tendencias de uso mes a mes), stacking de modelos, y sobre todo datos de mejor calidad (sin las peculiaridades artificiales)."
 
 **P: "¿Que pasa si el modelo se equivoca mucho?"**
 R: "Los falsos positivos (contactar a alguien que no iba a irse) tienen un coste bajo: el cliente recibe una oferta que probablemente aprecia. Los falsos negativos (no detectar un churner) tienen un coste alto: perdemos un cliente. Por eso es preferible un modelo con alto recall aunque baje la precision, y ajustar el threshold segun el coste relativo."

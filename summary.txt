@@ -89,7 +89,7 @@ El asl_flag (límite de gasto) activo parece proteger contra churn (41% vs 51%).
 
 Conclusión temprana de negocio: El perfil de cliente en riesgo es alguien con terminal viejo/barato, que está reduciendo su uso, y que no contacta con atención al cliente
 
-4. Trampas críticas (las que sí o sí tienes que resolver antes de modelar):
+4. Peculiaridades críticas (las que sí o sí tienes que resolver antes de modelar):
 
 El dataset está ordenado por Customer_ID y la tasa de churn cae del 49% al 37% en los últimos 10k IDs. Si haces un split sin shuffle, se te rompen las métricas. Customer_ID probablemente codifica una cohorte temporal — descártalo como feature.
 Clase 50/50 artificial. El churn real en telco es 1–5%, no 49.6%. El dataset está resampleado. Implicación: nada de SMOTE, y si reportas probabilidades a negocio tienes que recalibrarlas.
@@ -97,7 +97,7 @@ Valores negativos imposibles: eqpdays tiene 133 valores negativos (días con un 
 Nulos camuflados como "U" y "Z" en categóricas. El más grave: new_cell tiene 66.9% de "U" (tu isnull() no los cuenta). Las columnas kid0_2...kid16_17 tienen 90–96% de "U" — prácticamente inútiles.
 Multicolinealidad extrema: 19 pares con r > 0.95, incluso totcalls ↔ adjqty = 1.000 exacto y totmou ↔ adjmou = 1.000. Son variables duplicadas.
 
-5. Trampas conceptuales a defender en la presentación:
+5. Peculiaridades conceptuales a defender en la presentación:
 
 change_mou (tu predictor estrella) es posible leakage. La descripción no aclara si la medición del "monthly MoU" se solapa con la ventana de churn. Recomiendo entrenar con y sin la variable y reportar el delta de AUC.
 income no es el ingreso en dólares, es una variable ordinal 1–9.
@@ -122,7 +122,7 @@ AI_Test_SDG/
 
 Qué hace cada script:
 
-- data_preparation.py — Carga dataset.csv, aplica las 5 limpiezas de trampas (nulos camuflados, columnas >85% nulas, 
+- data_preparation.py — Carga dataset.csv, aplica las 5 limpiezas de peculiaridades (nulos camuflados, columnas >85% nulas, 
 eqpdays negativos, redundancia r>0.98, varianza cero), crea las 8 features nuevas, hace label encoding + imputación con mediana,
 split estratificado 70/15/15, y guarda todo. Acepta --input y --output como argumentos.
 
