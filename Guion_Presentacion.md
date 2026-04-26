@@ -1,7 +1,7 @@
 # Guion de Presentacion — Churn Prediction SDG Group
 
 **Duracion estimada: 30-35 minutos**
-**28 diapositivas | ~1.5 min por diapositiva de contenido, ~30s por diapositiva de seccion**
+**29 diapositivas | ~1.5 min por diapositiva de contenido, ~30s por diapositiva de seccion**
 
 ---
 
@@ -346,7 +346,29 @@
 
 ---
 
-## Diapositiva 22 — Apache Airflow: DAG de 3 Tasks (2 minutos)
+## Diapositiva 22 — Estructura del Proyecto y Modularizacion (1.5 minutos)
+
+**Lo que se ve:** Panel izquierdo con el arbol de carpetas del proyecto en fuente monoespaciada (scripts/, dags/, data/, models/, monitoring/, docker-compose.yaml, Dockerfile, requirements.txt). Panel derecho con 4 tarjetas categorizadas: CORE (azul), UTILS (verde), INFRA (morado), DESIGN (ambar).
+
+**Que decir:**
+
+> "Antes de ver el DAG y Docker en detalle, quiero mostrar como esta organizado el codigo, porque la modularizacion fue una decision de diseno deliberada.
+>
+> A la izquierda teneis el arbol del proyecto. La carpeta **scripts/** contiene 5 archivos Python. Los 3 scripts core — data_preparation, train_model y evaluate_model — siguen un patron comun: cada uno tiene una funcion main() independiente que encapsula toda su logica. El DAG simplemente importa y ejecuta cada main() via PythonOperator. Esto significa que los scripts se pueden ejecutar tanto dentro de Airflow como de forma aislada desde la terminal, lo cual facilita mucho el debugging.
+>
+> Los **modulos reutilizables** — db_utils.py y metrics_exporter.py — encapsulan la logica de conexion a PostgreSQL y el push de metricas a Prometheus respectivamente. Estan desacoplados de los scripts core: si PostgreSQL no esta disponible, el pipeline sigue funcionando porque cada extension tiene un fallback graceful.
+>
+> La **infraestructura esta completamente codificada**: docker-compose.yaml define los 10 servicios, el Dockerfile hereda de la imagen oficial de Airflow y añade las dependencias ML, y los volumenes montan scripts/ y data/ directamente en el contenedor para hot-reload sin rebuild.
+>
+> Un detalle importante: el **pickle es auto-contenido**. Incluye no solo el modelo XGBoost sino tambien los encoders, el imputer y el scaler. Esto permite que evaluate_model.py pueda hacer predicciones sin necesidad de reejecutar el preprocesamiento."
+
+**Posibles preguntas:**
+- *"Por que no usaste un unico script monolitico?"* → Porque la separacion en 3 scripts permite reejecutar pasos individuales (ej: re-evaluar sin re-entrenar), facilita el testing, y cada task de Airflow tiene visibilidad independiente en los logs.
+- *"Por que fallback en vez de lanzar error?"* → Porque las extensiones (DB, MLflow, Prometheus) son nice-to-have, no bloqueantes. El pipeline core debe funcionar siempre. Es un patron comun en produccion: degradacion graceful.
+
+---
+
+## Diapositiva 23 — Apache Airflow: DAG de 3 Tasks (2 minutos)
 
 **Lo que se ve:** 3 tarjetas en flujo (data_preparation → train_model → evaluate_model) con tiempos de ejecucion.
 
@@ -364,7 +386,7 @@
 
 ---
 
-## Diapositiva 23 — Infraestructura: Docker Compose (1.5 minutos)
+## Diapositiva 24 — Infraestructura: Docker Compose (1.5 minutos)
 
 **Lo que se ve:** 10 servicios de Docker, panel de decisiones de diseño, comandos.
 
@@ -384,7 +406,7 @@
 
 ---
 
-## Diapositiva 24 — Evidencia: Orquestacion y Experiment Tracking (1.5 minutos)
+## Diapositiva 25 — Evidencia: Orquestacion y Experiment Tracking (1.5 minutos)
 
 **Lo que se ve:** Capturas de pantalla reales de Airflow (DAG con 10 runs verdes) y MLflow (run completado con metricas).
 
@@ -396,7 +418,7 @@
 
 ---
 
-## Diapositiva 25 — Evidencia: Monitoreo con Prometheus y Grafana (1.5 minutos)
+## Diapositiva 26 — Evidencia: Monitoreo con Prometheus y Grafana (1.5 minutos)
 
 **Lo que se ve:** Captura grande del dashboard de Grafana con metricas reales + captura de Prometheus con la query churn_test_auc_roc.
 
@@ -410,13 +432,13 @@
 
 ---
 
-## Diapositiva 26 — Seccion: Conclusiones (15 segundos)
+## Diapositiva 27 — Seccion: Conclusiones (15 segundos)
 
 > "Para cerrar, un resumen de lo construido y los siguientes pasos."
 
 ---
 
-## Diapositiva 27 — Resumen y Siguientes Pasos (2 minutos)
+## Diapositiva 28 — Resumen y Siguientes Pasos (2 minutos)
 
 **Lo que se ve:** Checklist de lo construido (izquierda) + lista de siguientes pasos (derecha).
 
@@ -442,7 +464,7 @@
 
 ---
 
-## Diapositiva 28 — Gracias / Q&A (abierto)
+## Diapositiva 29 — Gracias / Q&A (abierto)
 
 **Lo que se ve:** "Gracias", "Preguntas y Respuestas", contacto.
 
