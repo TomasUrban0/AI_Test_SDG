@@ -1,7 +1,7 @@
 # Guion de Presentacion — Churn Prediction SDG Group
 
 **Duracion estimada: 30-35 minutos**
-**27 diapositivas | ~1.5 min por diapositiva de contenido, ~30s por diapositiva de seccion**
+**28 diapositivas | ~1.5 min por diapositiva de contenido, ~30s por diapositiva de seccion**
 
 ---
 
@@ -58,7 +58,30 @@
 
 ---
 
-## Diapositiva 6 — EDA: Hallazgos Principales (2.5 minutos)
+## Diapositiva 6 — Radiografia del Dataset (1.5 minutos)
+
+**Lo que se ve:** 3 tarjetas de estadisticas principales (100K filas x 100 cols, 43 columnas con nulos, 50.4/49.6% churn/no-churn), panel izquierdo con composicion de variables por tipo, panel derecho con top correlaciones con churn.
+
+**Que decir:**
+
+> "Antes de entrar en los hallazgos, veamos la radiografia general del dataset.
+>
+> Tenemos **100.000 filas y 100 columnas**. De esas 100 columnas, 69 son float, 10 son enteras y 21 categoricas. Esto ya nos dice que la mayoria de la informacion es numerica continua: facturacion, minutos de uso, etc.
+>
+> **43 columnas contienen nulos**, pero ojo: muchos de estos nulos estan camuflados con valores como 'U' o 'Z', que parecen categorias validas pero en realidad son datos faltantes. Esto es una trampa clasica que un pipeline automatico no detectaria con isnull(). No hay filas duplicadas, lo cual es bueno.
+>
+> El balance de churn es **50.4% vs 49.6%**, practicamente 50/50. Como ya comente, esto es artificial — en la realidad el churn esta en el 1-3%. El balance nos facilita el entrenamiento pero hay que recordarlo al interpretar resultados.
+>
+> En cuanto a **correlaciones con churn**, las mas fuertes son sorprendentemente bajas: eqpdays (dias de antiguedad del equipo) con +0.113, hnd_price (precio del terminal) con -0.103, y totmrc_Mean (facturacion recurrente media) con -0.069. Que la correlacion maxima sea de solo 0.11 nos dice que ningun feature individual predice churn por si solo — el valor esta en la combinacion de señales, que es donde XGBoost brilla.
+>
+> El perfil del churner que emerge es: equipo antiguo, terminal barato, menor gasto mensual, menos minutos de uso y menos llamadas completadas. Es un cliente desenganchado."
+
+**Posibles preguntas:**
+- *"¿Por que las correlaciones son tan bajas?"* → Porque churn es un fenomeno multifactorial. Ningun factor aislado lo explica, por eso necesitamos modelos que capturen interacciones no lineales entre variables.
+
+---
+
+## Diapositiva 7 — EDA: Hallazgos Principales (2.5 minutos)
 
 **Lo que se ve:** 4 tarjetas con hallazgos clave: balance artificial, nulos camuflados, multicolinealidad, valores negativos.
 
@@ -80,7 +103,7 @@
 
 ---
 
-## Diapositiva 7 — Peculiaridades Detectadas en el Dataset (2 minutos)
+## Diapositiva 8 — Peculiaridades Detectadas en el Dataset (2 minutos)
 
 **Lo que se ve:** 5 filas con badges de severidad (CRITICA, MEDIA, VALIDADA, ALTA).
 
@@ -100,7 +123,7 @@
 
 ---
 
-## Diapositiva 8 — Feature Engineering: 8 Variables Nuevas (2 minutos)
+## Diapositiva 9 — Feature Engineering: 8 Variables Nuevas (2 minutos)
 
 **Lo que se ve:** Tabla con las 8 features, su descripcion y logica de calculo.
 
@@ -129,13 +152,13 @@
 
 ---
 
-## Diapositiva 9 — Seccion: Modelo Predictivo (15 segundos)
+## Diapositiva 10 — Seccion: Modelo Predictivo (15 segundos)
 
 > "Pasemos a la parte de modelado."
 
 ---
 
-## Diapositiva 10 — Pipeline de Preprocesamiento (1.5 minutos)
+## Diapositiva 11 — Pipeline de Preprocesamiento (1.5 minutos)
 
 **Lo que se ve:** 5 tarjetas en flujo horizontal: Limpieza → FE → LabelEncoder → Imputacion → Split.
 
@@ -155,7 +178,7 @@
 
 ---
 
-## Diapositiva 11 — Benchmarking: 5 Modelos Evaluados (2 minutos)
+## Diapositiva 12 — Benchmarking: 5 Modelos Evaluados (2 minutos)
 
 **Lo que se ve:** Grafico de barras horizontales con AUC-ROC de 5 modelos + panel explicativo "Por que XGBoost".
 
@@ -178,7 +201,7 @@
 
 ---
 
-## Diapositiva 12 — Hyperparameter Tuning (1.5 minutos)
+## Diapositiva 13 — Hyperparameter Tuning (1.5 minutos)
 
 **Lo que se ve:** Panel izquierdo con parametros de configuracion, panel derecho con razonamiento.
 
@@ -196,7 +219,7 @@
 
 ---
 
-## Diapositiva 13 — Metricas Finales en Test Set (2.5 minutos)
+## Diapositiva 14 — Metricas Finales en Test Set (2.5 minutos)
 
 **Lo que se ve:** 4 tarjetas grandes con AUC-ROC 0.6986, F1 0.6399, Recall 0.6415, Precision 0.6382 + confusion matrix + interpretacion.
 
@@ -218,7 +241,7 @@
 
 ---
 
-## Diapositiva 14 — Entendiendo las Metricas (1.5 minutos)
+## Diapositiva 15 — Entendiendo las Metricas (1.5 minutos)
 
 **Lo que se ve:** 4 filas explicando AUC-ROC, Precision, Recall, F1.
 
@@ -236,7 +259,7 @@
 
 ---
 
-## Diapositiva 15 — SHAP: Interpretabilidad del Modelo (2 minutos)
+## Diapositiva 16 — SHAP: Interpretabilidad del Modelo (2 minutos)
 
 **Lo que se ve:** Ranking de top 10 features por importancia SHAP (barras) + panel de interpretacion.
 
@@ -259,13 +282,13 @@
 
 ---
 
-## Diapositiva 16 — Seccion: Valor de Negocio (15 segundos)
+## Diapositiva 17 — Seccion: Valor de Negocio (15 segundos)
 
 > "Ahora traduzcamos estos numeros a impacto de negocio."
 
 ---
 
-## Diapositiva 17 — Curva de Lift: Impacto en Negocio (2 minutos)
+## Diapositiva 18 — Curva de Lift: Impacto en Negocio (2 minutos)
 
 **Lo que se ve:** Grafico de linea con curva de lift vs aleatorio + panel de impacto practico.
 
@@ -281,7 +304,7 @@
 
 ---
 
-## Diapositiva 18 — Estudio de Ablacion: change_mou (1.5 minutos)
+## Diapositiva 19 — Estudio de Ablacion: change_mou (1.5 minutos)
 
 **Lo que se ve:** Explicacion del problema, tabla comparativa con/sin change_mou, conclusion con check verde.
 
@@ -297,7 +320,7 @@
 
 ---
 
-## Diapositiva 19 — Recomendaciones de Negocio (2 minutos)
+## Diapositiva 20 — Recomendaciones de Negocio (2 minutos)
 
 **Lo que se ve:** 5 recomendaciones con iconos.
 
@@ -317,13 +340,13 @@
 
 ---
 
-## Diapositiva 20 — Seccion: Arquitectura del Pipeline (15 segundos)
+## Diapositiva 21 — Seccion: Arquitectura del Pipeline (15 segundos)
 
 > "Veamos como se lleva todo esto a un entorno de produccion."
 
 ---
 
-## Diapositiva 21 — Apache Airflow: DAG de 3 Tasks (2 minutos)
+## Diapositiva 22 — Apache Airflow: DAG de 3 Tasks (2 minutos)
 
 **Lo que se ve:** 3 tarjetas en flujo (data_preparation → train_model → evaluate_model) con tiempos de ejecucion.
 
@@ -341,7 +364,7 @@
 
 ---
 
-## Diapositiva 22 — Infraestructura: Docker Compose (1.5 minutos)
+## Diapositiva 23 — Infraestructura: Docker Compose (1.5 minutos)
 
 **Lo que se ve:** 10 servicios de Docker, panel de decisiones de diseño, comandos.
 
@@ -361,7 +384,7 @@
 
 ---
 
-## Diapositiva 23 — Evidencia: Orquestacion y Experiment Tracking (1.5 minutos)
+## Diapositiva 24 — Evidencia: Orquestacion y Experiment Tracking (1.5 minutos)
 
 **Lo que se ve:** Capturas de pantalla reales de Airflow (DAG con 10 runs verdes) y MLflow (run completado con metricas).
 
@@ -373,7 +396,7 @@
 
 ---
 
-## Diapositiva 24 — Evidencia: Monitoreo con Prometheus y Grafana (1.5 minutos)
+## Diapositiva 25 — Evidencia: Monitoreo con Prometheus y Grafana (1.5 minutos)
 
 **Lo que se ve:** Captura grande del dashboard de Grafana con metricas reales + captura de Prometheus con la query churn_test_auc_roc.
 
@@ -387,13 +410,13 @@
 
 ---
 
-## Diapositiva 25 — Seccion: Conclusiones (15 segundos)
+## Diapositiva 26 — Seccion: Conclusiones (15 segundos)
 
 > "Para cerrar, un resumen de lo construido y los siguientes pasos."
 
 ---
 
-## Diapositiva 26 — Resumen y Siguientes Pasos (2 minutos)
+## Diapositiva 27 — Resumen y Siguientes Pasos (2 minutos)
 
 **Lo que se ve:** Checklist de lo construido (izquierda) + lista de siguientes pasos (derecha).
 
@@ -419,7 +442,7 @@
 
 ---
 
-## Diapositiva 27 — Gracias / Q&A (abierto)
+## Diapositiva 28 — Gracias / Q&A (abierto)
 
 **Lo que se ve:** "Gracias", "Preguntas y Respuestas", contacto.
 
