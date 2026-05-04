@@ -20,19 +20,19 @@ Te dan un dataset con información de clientes y sus características.
 ## Resultados
 
 AI_Test_SDG/
-├── scripts/
-│   ├── data_preparation.py   (12 KB)
-│   ├── train_model.py        (7.8 KB)
-│   └── evaluate_model.py     (8.0 KB)
-├── data/
-│   ├── dataset.csv           (input original)
-│   └── processed/            (generado por paso 1)
-│       ├── X_train.csv, X_val.csv, X_test.csv
-│       ├── y_train.csv, y_val.csv, y_test.csv
-│       └── preprocessing_artifacts.pkl
-└── models/                   (generado por pasos 2 y 3)
-    ├── churn_model.pkl
-    └── evaluation_report.json
+    scripts/
+        data_preparation.py   (12 KB)
+        train_model.py        (7.8 KB)
+        evaluate_model.py     (8.0 KB)
+    data/
+        dataset.csv          
+        processed/            
+        X_train.csv, X_val.csv, X_test.csv
+        y_train.csv, y_val.csv, y_test.csv
+        preprocessing_artifacts.pkl
+    models/                   
+        churn_model.pkl
+        evaluation_report.json
 
 Qué hace cada script:
 
