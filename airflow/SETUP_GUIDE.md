@@ -33,7 +33,7 @@ docker compose version    # Debe mostrar v2.x
 ## Estructura del proyecto
 
 ```
-AI_Test_SDG/
+churn-prediction/
 ├── airflow/                      ← TÚ ESTÁS AQUÍ
 │   ├── docker-compose.yaml       ← Configuración de los contenedores
 │   ├── Dockerfile                ← Imagen custom con xgboost, sklearn, mlflow, etc.
@@ -79,7 +79,7 @@ AI_Test_SDG/
 Asegúrate de que `dataset.csv` está en la carpeta `data/`:
 
 ```bash
-# Desde la raíz del proyecto (AI_Test_SDG/)
+# Desde la raíz del proyecto
 mkdir -p data models
 cp dataset.csv data/
 ```
